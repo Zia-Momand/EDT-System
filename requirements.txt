@@ -9,3 +9,6 @@ scikit-learn
 tensorflow  # If using AI models
 psycopg2  # PostgreSQL database
 mysql-connector-python  # MySQL support
+streamlit
+openai
+langchain
