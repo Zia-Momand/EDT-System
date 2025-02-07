@@ -1,0 +1,11 @@
+streamlit
+numpy
+pandas
+requests
+matplotlib
+seaborn
+openai   # If using OpenAI for chatbot
+scikit-learn
+tensorflow  # If using AI models
+psycopg2  # PostgreSQL database
+mysql-connector-python  # MySQL support
