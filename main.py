@@ -1,7 +1,27 @@
 import streamlit as st
+import subprocess
+import os
+import time
 from auth.auth import login_user, register_user
 
-# Initialize session state variables
+# ------------------------
+# ✅ Start cors_server.py Automatically
+# ------------------------
+
+CORS_SERVER_PATH = os.path.join(os.path.dirname(__file__), "static", "cors_server.py")
+
+def start_cors_server():
+    """Start the CORS server in the background."""
+    print("Starting CORS Server...")
+    return subprocess.Popen(["python", CORS_SERVER_PATH], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+# Start Flask CORS server
+cors_process = start_cors_server()
+time.sleep(2)  # Wait for the Flask server to initialize
+
+# ------------------------
+# ✅ Streamlit Session State Setup
+# ------------------------
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 if "username" not in st.session_state:
@@ -13,7 +33,9 @@ if "show_register" not in st.session_state:
 if not st.session_state["authenticated"]:
     st.set_page_config(initial_sidebar_state="collapsed")
 
-# Login Form
+# ------------------------
+# ✅ Login Form
+# ------------------------
 def login():
     st.title("Secure Login")
 
@@ -25,14 +47,16 @@ def login():
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.success(f"Welcome, {username}!")
-            st.switch_page("pages/dashboard.py")  # ✅ Correct path: "pages/dashboard"
+            st.switch_page("pages/dashboard.py")  # ✅ Redirect to dashboard
         else:
             st.error("Invalid username or password")
 
     if st.button("Register Here"):
         st.session_state["show_register"] = True
 
-# Registration Form
+# ------------------------
+# ✅ Registration Form
+# ------------------------
 def register():
     st.title("Register")
 
@@ -51,7 +75,9 @@ def register():
     if st.button("Back to Login"):
         st.session_state["show_register"] = False
 
-# Main UI Logic (Routing)
+# ------------------------
+# ✅ Main UI Logic (Routing)
+# ------------------------
 if not st.session_state["authenticated"]:
     st.sidebar.empty()  # Hide sidebar when not authenticated
     if st.session_state["show_register"]:
@@ -59,4 +85,4 @@ if not st.session_state["authenticated"]:
     else:
         login()
 else:
-    st.switch_page("pages/dashboard.py")  # ✅ Correct path: "pages/dashboard"
+    st.switch_page("pages/dashboard.py")  # ✅ Redirect to dashboard
