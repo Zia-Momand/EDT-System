@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
+import streamlit as st
+st.set_page_config(layout="centered", initial_sidebar_state="expanded")
 import os
 import time
-import streamlit as st
 from langchain.chat_models import ChatOpenAI
 from langchain import PromptTemplate, LLMChain
 from langchain.embeddings.openai import OpenAIEmbeddings

@@ -3,11 +3,14 @@ import subprocess
 import os
 import time
 from auth.auth import login_user, register_user
+from pyngrok import ngrok
 
 # ------------------------
 # ✅ Start cors_server.py Automatically
 # ------------------------
-
+# Start an HTTP tunnel for port 8501 (or your Flask app port)
+# public_url = ngrok.connect(8501, "http")
+# print("Public URL:", public_url)
 CORS_SERVER_PATH = os.path.join(os.path.dirname(__file__), "static", "cors_server.py")
 
 def start_cors_server():

@@ -1,24 +1,100 @@
 # heart_config.py
 import os
 import json
+import time
 import requests
 import base64
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime
 import streamlit as st
+import numpy as np
+import plotly.express as px
+import altair as alt
 
 # Fitbit OAuth2 configuration constants
 CLIENT_ID = "23PDSY"
 CLIENT_SECRET = "54541489aa4c89089e7b20ed97b9087e"
-REDIRECT_URI = "https://elderlycare.loca.lt/callback"
+REDIRECT_URI = "https://myfitbitauth.ngrok.io"
 AUTHORIZATION_URI = "https://www.fitbit.com/oauth2/authorize"
 TOKEN_URI = "https://api.fitbit.com/oauth2/token"
+
+# Define the path for tokens.json (in the same folder as this file)
+TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
+
+# ----- OAuth Flow Functions --------------------------------------------------
+def get_fitbit_auth_url():
+    """
+    Generate and return the Fitbit OAuth2 URL for user authorization.
+    """
+    scope = ("heartrate activity oxygen_saturation electrocardiogram "
+             "cardio_fitness sleep respiratory_rate activity temperature")
+    response_type = "code"
+    auth_url = (
+        f"{AUTHORIZATION_URI}"
+        f"?response_type={response_type}"
+        f"&client_id={CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&scope={scope}"
+        f"&expires_in=604800"  # token expiration in seconds (optional)
+    )
+    return auth_url
+
+def exchange_code_for_tokens(code):
+    """
+    Exchange the provided authorization code for access and refresh tokens.
+    Adds an 'iat' timestamp to the tokens for expiration checking.
+    """
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
+    }
+    data = {
+        "client_id": CLIENT_ID,
+        "grant_type": "authorization_code",
+        "redirect_uri": REDIRECT_URI,
+        "code": code,
+    }
+
+    response = requests.post(TOKEN_URI, headers=headers, data=data)
+    if response.status_code == 200:
+        tokens = response.json()
+        tokens["iat"] = int(time.time())
+        return tokens
+    else:
+        st.error("Failed to exchange code for tokens.")
+        st.write(response.text)
+        return None
+
+# ----- Token Initialization --------------------------------------------------
+# Add a checkbox to allow forced reauthorization if needed.
+force_auth = st.checkbox("Force reauthorization (to obtain a fresh token)", value=False)
+if force_auth and os.path.exists(TOKENS_FILE):
+    os.remove(TOKENS_FILE)
+    st.info("Existing token file removed. A new token will be generated.")
+
+if not os.path.exists(TOKENS_FILE):
+    st.write("No tokens.json file found. Please authorize the application.")
+    st.write("Visit the following URL to authorize and obtain a new authorization code:")
+    st.write(get_fitbit_auth_url())
+    new_code = st.text_input("Enter the new authorization code:")
+    if new_code:
+        tokens = exchange_code_for_tokens(new_code)
+        if tokens:
+            with open(TOKENS_FILE, "w", encoding="utf-8") as f:
+                json.dump(tokens, f, indent=4)
+            st.success("New tokens saved successfully!")
+        else:
+            st.error("Failed to exchange new authorization code for tokens.")
+            st.stop()  # Stop execution if tokens are not obtained.
+else:
+    with open(TOKENS_FILE, "r", encoding="utf-8") as f:
+        tokens = json.load(f)
 
 # ----- Token Manager ---------------------------------------------------------
 class TokenManager:
     def __init__(self):
-        self.tokensFilePath = os.path.join(os.path.dirname(__file__), "tokens.json")
+        self.tokensFilePath = TOKENS_FILE
 
     def read_tokens(self):
         """Read tokens from the tokens.json file."""
@@ -31,94 +107,81 @@ class TokenManager:
     def write_tokens(self, tokens):
         """Write updated tokens to tokens.json."""
         with open(self.tokensFilePath, "w", encoding="utf-8") as f:
-            json.dump(tokens, f)
+            json.dump(tokens, f, indent=4)
 
-# ----- OAuth Flow Functions --------------------------------------------------
-def get_fitbit_auth_url():
+# ----- Token Expiration and Refresh ------------------------------------------
+def is_token_expired():
     """
-    Returns the URL where the user should be redirected to authorize the application.
-    Adjust the scope as needed.
-    """
-    scope = "heartrate activity"  # adjust scopes based on your needs
-    response_type = "code"
-    auth_url = (
-        f"{AUTHORIZATION_URI}"
-        f"?response_type={response_type}"
-        f"&client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}"
-        f"&scope={scope}"
-        f"&expires_in=604800"  # optional: token expiration in seconds
-    )
-    return auth_url
-
-def exchange_code_for_tokens(code):
-    """
-    After the user authorizes the app and is redirected to your REDIRECT_URI,
-    exchange the provided authorization code for access and refresh tokens.
-    """
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-    # Create a basic auth header using client_id and client_secret.
-    auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
-    headers["Authorization"] = f"Basic {auth_header}"
-
-    data = {
-        "client_id": CLIENT_ID,
-        "grant_type": "authorization_code",
-        "redirect_uri": REDIRECT_URI,
-        "code": code,
-    }
-
-    response = requests.post(TOKEN_URI, headers=headers, data=data)
-    if response.status_code == 200:
-        tokens = response.json()
-        return tokens
-    else:
-        st.error("Failed to exchange code for tokens.")
-        st.write(response.text)
-        return None
-
-def refresh_fitbit_tokens(refresh_token):
-    """
-    Refresh the access token using the stored refresh token.
-    """
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-    auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
-    headers["Authorization"] = f"Basic {auth_header}"
-
-    data = {
-        "grant_type": "refresh_token",
-        "refresh_token": refresh_token,
-        "client_id": CLIENT_ID
-    }
-
-    response = requests.post(TOKEN_URI, headers=headers, data=data)
-    if response.status_code == 200:
-        new_tokens = response.json()
-        token_manager = TokenManager()
-        token_manager.write_tokens(new_tokens)
-        return new_tokens
-    else:
-        st.error(f"Error refreshing token: {response.status_code}")
-        st.write(response.text)
-        return None
-
-# ----- Helper Functions for Building API URLs -----------------------------
-def get_fitbit_api_url_for_day(date, detail_level="1min"):
-    """
-    Return the intraday API URL for a given day.
-    Date should be a string in YYYY-MM-DD format.
+    Check if the current access token is expired.
+    Uses the 'iat' (issued-at) timestamp plus the 'expires_in' duration.
+    Refresh the token 5 minutes (300 seconds) before actual expiration.
     """
     token_manager = TokenManager()
     tokens = token_manager.read_tokens()
     if not tokens:
-        st.error("No Fitbit tokens found. Please authenticate and store tokens.")
+        return True
+    expires_in = int(tokens.get("expires_in", 0))
+    iat = int(tokens.get("iat", 0))
+    current_time = int(time.time())
+    return current_time >= (iat + expires_in - 300)
+
+def refresh_fitbit_tokens(refresh_token):
+    """
+    Refresh the access token using the provided refresh token.
+    Adds an 'iat' timestamp to the new tokens and saves them.
+    """
+    headers = {
+        "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+       "grant_type": "refresh_token",
+       "refresh_token": refresh_token
+    }
+    response = requests.post(TOKEN_URI, headers=headers, data=data)
+    if response.status_code == 200:
+        new_tokens = response.json()
+        new_tokens["iat"] = int(time.time())
+        # Save new tokens using TokenManager
+        token_manager = TokenManager()
+        token_manager.write_tokens(new_tokens)
+        st.info("Tokens refreshed successfully.")
+        return new_tokens
+    else:
+        st.error("Token refresh failed. Need re-authentication.")
+        st.write(response.text)
+        return None
+
+def get_valid_tokens():
+    """
+    Retrieve tokens from storage and refresh if they are expired.
+    Returns valid tokens or stops the app if no valid token is available.
+    """
+    token_manager = TokenManager()
+    tokens = token_manager.read_tokens()
+    if not tokens:
+        st.error("No tokens available. Please authenticate.")
         st.stop()
+    if is_token_expired():
+        st.info("Access token expired. Attempting to refresh...")
+        refresh_token_val = tokens.get("refresh_token")
+        new_tokens = refresh_fitbit_tokens(refresh_token_val)
+        if new_tokens:
+            tokens = new_tokens
+        else:
+            st.error("Token refresh failed. Please reauthenticate.")
+            st.stop()
+    return tokens
+
+# ----- Fitbit API URL Helpers -----------------------------------------------
+def get_fitbit_api_url_for_day(date_str, detail_level="1min"):
+    """
+    Return the intraday API URL for a given day.
+    Date should be a string in YYYY-MM-DD format.
+    """
+    tokens = get_valid_tokens()
     USER_ID = tokens.get("user_id")
-    return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{date}/1d/{detail_level}.json"
+    return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{date_str}/1d/{detail_level}.json"
 
 def get_fitbit_api_url_for_range(start_date, end_date):
     """
@@ -126,91 +189,107 @@ def get_fitbit_api_url_for_range(start_date, end_date):
     Dates should be strings in YYYY-MM-DD format.
     (Note: The date-range endpoint returns summary data per day.)
     """
-    token_manager = TokenManager()
-    tokens = token_manager.read_tokens()
-    if not tokens:
-        st.error("No Fitbit tokens found. Please authenticate and store tokens.")
-        st.stop()
+    tokens = get_valid_tokens()
     USER_ID = tokens.get("user_id")
     return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{start_date}/{end_date}.json"
 
-# ----- Update & Load Functions for Daily Data ------------------------------
-def update_heart_rate_data_for_day(date, label, detail_level="1min"):
+# ----- Data Fetch and Load Functions ----------------------------------------
+def update_heart_rate_data_for_day(date_str, label, detail_level="1min"):
     """
     Download heart rate data (in JSON format) for the specified date using the intraday endpoint.
-    Save the file in static/data as '<date>_<label>.json' and return the JSON data.
+    Saves the file in static/data as '<date>_<label>.json' and returns the JSON data.
+    Automatically refreshes the token if needed.
     """
-    api_url = get_fitbit_api_url_for_day(date, detail_level)
-    token_manager = TokenManager()
-    tokens = token_manager.read_tokens()
-    if not tokens:
-        st.error("No Fitbit tokens found. Please authenticate.")
-        st.stop()
-    FITBIT_ACCESS_TOKEN = tokens.get("access_token")
-    
-    headers = {"Authorization": f"Bearer {FITBIT_ACCESS_TOKEN}"}
+    api_url = get_fitbit_api_url_for_day(date_str, detail_level)
+    tokens = get_valid_tokens()
+    access_token = tokens.get("access_token")
+    headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
         json_data = response.json()
-        data_dir = os.path.join("static", "data")
-        os.makedirs(data_dir, exist_ok=True)
-        file_name = f"{date}_{label}.json"
-        file_path = os.path.join(data_dir, file_name)
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(json_data, f, indent=2)
-        return json_data
     elif response.status_code == 401:
-        st.error("401 Unauthorized. The access token may be expired.")
-        return None
+        # Token might be expired; try refreshing and retrying
+        tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+        if tokens:
+            access_token = tokens.get("access_token")
+            headers = {"Authorization": f"Bearer {access_token}"}
+            response = requests.get(api_url, headers=headers)
+            if response.status_code == 200:
+                json_data = response.json()
+            else:
+                st.error(f"Error after token refresh: {response.status_code}")
+                st.write(response.text)
+                return None
+        else:
+            st.error("Token refresh failed. Please reauthenticate.")
+            return None
     else:
         st.error(f"Error fetching heart rate data: {response.status_code}")
+        st.write(response.text)
         return None
 
-def load_heart_rate_data_for_day(date, label):
+    data_dir = os.path.join("static", "data")
+    os.makedirs(data_dir, exist_ok=True)
+    file_name = f"{date_str}_{label}.json"
+    file_path = os.path.join(data_dir, file_name)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(json_data, f, indent=2)
+    return json_data
+
+def load_heart_rate_data_for_day(date_str, label):
     """
     Load the heart rate JSON file for the given date (and label) from static/data,
     and return the 'dataset' (intraday measurements).
     """
-    file_path = os.path.join("static", "data", f"{date}_{label}.json")
+    file_path = os.path.join("static", "data", f"{date_str}_{label}.json")
     if not os.path.exists(file_path):
-        st.warning(f"No heart rate data file found for {date} ({label}). Please refresh.")
+        st.warning(f"No heart rate data file found for {date_str} ({label}). Please refresh.")
         return None
     with open(file_path, "r", encoding="utf-8") as f:
         json_data = json.load(f)
     return json_data.get("activities-heart-intraday", {}).get("dataset", [])
 
-# ----- Update & Load Functions for Range Data (Week Trends) ----------------
 def update_heart_rate_data_for_range(start_date, end_date):
     """
     Download heart rate data for the specified date range using the range endpoint.
-    Save the file in static/data as '<start_date>_to_{end_date}_week.json'
-    and return the JSON data.
+    Saves the file in static/data as '<start_date>_to_{end_date}_week.json'
+    and returns the JSON data.
+    Automatically refreshes the token if needed.
     """
     api_url = get_fitbit_api_url_for_range(start_date, end_date)
-    token_manager = TokenManager()
-    tokens = token_manager.read_tokens()
-    if not tokens:
-        st.error("No Fitbit tokens found. Please authenticate.")
-        st.stop()
-    FITBIT_ACCESS_TOKEN = tokens.get("access_token")
-    
-    headers = {"Authorization": f"Bearer {FITBIT_ACCESS_TOKEN}"}
+    tokens = get_valid_tokens()
+    access_token = tokens.get("access_token")
+    headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
         json_data = response.json()
-        data_dir = os.path.join("static", "data")
-        os.makedirs(data_dir, exist_ok=True)
-        file_name = f"{start_date}_to_{end_date}_week.json"
-        file_path = os.path.join(data_dir, file_name)
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(json_data, f, indent=2)
-        return json_data
     elif response.status_code == 401:
-        st.error("401 Unauthorized. The access token may be expired.")
-        return None
+        tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+        if tokens:
+            access_token = tokens.get("access_token")
+            headers = {"Authorization": f"Bearer {access_token}"}
+            response = requests.get(api_url, headers=headers)
+            if response.status_code == 200:
+                json_data = response.json()
+            else:
+                st.error(f"Error after token refresh: {response.status_code}")
+                st.write(response.text)
+                return None
+        else:
+            st.error("Token refresh failed. Please reauthenticate.")
+            return None
     else:
         st.error(f"Error fetching heart rate data: {response.status_code}")
+        st.write(response.text)
         return None
+
+    data_dir = os.path.join("static", "data")
+    os.makedirs(data_dir, exist_ok=True)
+    file_name = f"{start_date}_to_{end_date}_week.json"
+    file_path = os.path.join(data_dir, file_name)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(json_data, f, indent=2)
+    return json_data
 
 def load_heart_rate_data_for_range(start_date, end_date):
     """
@@ -226,22 +305,402 @@ def load_heart_rate_data_for_range(start_date, end_date):
         json_data = json.load(f)
     return json_data.get("activities-heart", [])
 
-# ----- Processing and Plotting Functions ------------------------------------
+def load_weekly_heart_rate_data():
+    """
+    Load the most recent 7 days of heart rate JSON files from static/data,
+    extracting weekly trends from available '<date>_24h.json' files.
+    """
+    base_path = os.path.join("static", "data")
+    today = date.today()
+    weekly_data = {}
+
+    for i in range(7):
+        date_str = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+        file_path = os.path.join(base_path, f"{date_str}_24h.json")
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                json_data = json.load(f)
+                daily_data = json_data.get("activities-heart-intraday", {}).get("dataset", [])
+                if daily_data:
+                    weekly_data[date_str] = daily_data
+
+    if not weekly_data:
+        st.warning("No heart rate data available for the past week.")
+        return None
+
+    return weekly_data
+
+# ----- Data Processing and Plotting Functions -------------------------------
 def process_heart_rate_data(data):
     """Process raw heart rate data into a DataFrame (for intraday data)."""
     if not data:
         return None
     df = pd.DataFrame(data)
-    df["time"] = pd.to_datetime(df["time"])  # Convert time strings to datetime objects
+    df["time"] = pd.to_datetime(df["time"])
     df.set_index("time", inplace=True)
     return df
 
-def plot_heart_rate_for_day(date, label):
+def calculate_rmssd_for_5min_intervals(data):
+    """
+    Calculate RMSSD (Root Mean Square of Successive Differences) for each 5-minute interval.
+    """
+    if not data or len(data) < 5:
+        st.warning("Insufficient data to calculate RMSSD.")
+        return None
+
+    df = pd.DataFrame(data)
+    df["Time"] = pd.to_datetime(df["time"], format="%H:%M:%S")
+    rmssd_results = []
+    time_labels = []
+
+    for i in range(0, len(df) - 5, 5):
+        window = df.iloc[i : i + 5]
+        # Check that time differences are roughly 1 minute apart
+        time_diff = np.diff(window["Time"].astype(np.int64) // 10**9) / 60
+        if not np.all(time_diff == 1):
+            continue
+
+        # Convert heart rate (BPM) to RR intervals in milliseconds
+        rr_intervals = 60000 / window["value"]
+        rr_diffs = np.diff(rr_intervals)
+        rmssd = np.sqrt(np.mean(rr_diffs**2))
+        rmssd_results.append(rmssd)
+        time_labels.append(window.iloc[0]["Time"].strftime("%H:%M"))
+
+    if not rmssd_results:
+        st.warning("No valid RMSSD results due to inconsistent time intervals.")
+        return None
+
+    return time_labels, rmssd_results
+
+def fetch_sleep_data():
+    """
+    Fetch sleep data from Fitbit API for today's date and save it as a JSON file.
+    Uses get_valid_tokens() to retrieve stored Fitbit tokens.
+    """
+    current_date = datetime.today().strftime("%Y-%m-%d")
+    tokens = get_valid_tokens()
+
+    USER_ID = tokens.get("user_id")
+    access_token = tokens.get("access_token")
+    if not USER_ID or not access_token:
+        st.error("Missing user ID or access token in stored tokens.")
+        return None
+
+    FITBIT_SLEEP_API = f"https://api.fitbit.com/1.2/user/{USER_ID}/sleep/date/{current_date}.json"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(FITBIT_SLEEP_API, headers=headers)
+
+    if response.status_code == 200:
+        sleep_data = response.json()
+        os.makedirs(os.path.join("static", "data", "sleep"), exist_ok=True)
+        file_path = os.path.join("static", "data", "sleep", f"{current_date}_sleep.json")
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(sleep_data, f, indent=4)
+        return sleep_data
+    else:
+        st.error(f"Failed to fetch sleep data: {response.status_code} - {response.text}")
+        return None
+#### =============================== Sleep stages process functions =============================
+def load_sleep_data(date_str=None):
+    """
+    Load sleep data from static/data/sleep.
+    """
+    if date_str is None:
+        date_str = datetime.today().strftime("%Y-%m-%d")
+    file_path = os.path.join("static", "data", "sleep", f"{date_str}_sleep.json")
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+def process_sleep_data(sleep_data):
+    """
+    Process Fitbit sleep data into a structured DataFrame.
+    Extracts sleep stages from the JSON, converts timestamps, computes
+    end times, and creates a label combining the sleep level with its duration.
+    Also adds formatted time strings for tooltip display.
+    """
+    if not sleep_data or "sleep" not in sleep_data or len(sleep_data["sleep"]) == 0:
+        st.warning("No sleep data available.")
+        return None
+
+    # Extract sleep stages from the first sleep record
+    sleep_stages = sleep_data["sleep"][0]["levels"]["data"]
+    df = pd.DataFrame(sleep_stages)
+    
+    # Convert starting time and compute end time for each stage
+    df["dateTime"] = pd.to_datetime(df["dateTime"])
+    df["endTime"] = df["dateTime"] + pd.to_timedelta(df["seconds"], unit="s")
+    
+    # Create string columns that show only the time for tooltips
+    df["start_time"] = df["dateTime"].dt.strftime("%H:%M:%S")
+    df["end_time"] = df["endTime"].dt.strftime("%H:%M:%S")
+    
+    # Format duration as "X min Y sec"
+    df["duration_text"] = df["seconds"].apply(lambda s: f"{s//60} min {s % 60} sec")
+    
+    # Create a label combining sleep level and its duration
+    df["label"] = df.apply(lambda row: f"{row['level'].capitalize()} ({row['duration_text']})", axis=1)
+    return df
+
+def plot_sleep_stages(df):
+    """
+    Create a clear sleep stages timeline using Altair.
+    - Each sleep stage is shown as a horizontal colored bar.
+    - A dotted line connects the end of one stage to the start of the next.
+    - The tooltip shows only start/end times (HH:MM:SS).
+    """
+    if df is None or df.empty:
+        st.warning("No valid sleep data to plot.")
+        return
+
+    # Sort data by start time
+    df = df.copy().sort_values("dateTime").reset_index(drop=True)
+    
+    # Create string columns showing only the time
+    df["start_time_str"] = df["dateTime"].dt.strftime("%H:%M:%S")
+    df["end_time_str"]   = df["endTime"].dt.strftime("%H:%M:%S")
+    
+    # Define color mapping for sleep levels
+    sleep_colors = {
+        "wake": "#c19a6b",
+        "rem": "#b19cd9",
+        "light": "#654ea3",
+        "deep": "#000033",
+    }
+
+    # 1) BARS: horizontal bars from dateTime to endTime
+    base = alt.Chart(df).encode(
+        y=alt.Y('level:N', title='Sleep Stage',
+                sort=["wake", "rem", "light", "deep"])
+    )
+
+    bars = base.mark_bar().encode(
+        x=alt.X('dateTime:T', title='Time'),
+        x2=alt.X2('endTime:T'),
+        color=alt.Color('level:N',
+                        scale=alt.Scale(domain=list(sleep_colors.keys()),
+                                        range=list(sleep_colors.values())),
+                        legend=None),
+        tooltip=[
+            alt.Tooltip("level:N", title="Sleep Stage"),
+            alt.Tooltip("start_time_str:N", title="Start Time"),
+            alt.Tooltip("end_time_str:N", title="End Time"),
+        ]
+    )
+
+    # 2) TRANSITIONS: dotted lines between consecutive stages
+    #    Build a small dataframe that pairs (endTime_i, level_i) -> (dateTime_{i+1}, level_{i+1})
+    lines_list = []
+    line_id = 0
+
+    for i in range(len(df) - 1):
+        current_end = df.loc[i, 'endTime']
+        current_stage = df.loc[i, 'level']
+        next_start = df.loc[i+1, 'dateTime']
+        next_stage = df.loc[i+1, 'level']
+
+        # If you only want a line when there's an actual time gap, you can check:
+        # if next_start > current_end:
+        #     ...
+
+        lines_list.append({
+            'line_id': line_id,
+            'time': current_end,
+            'stage': current_stage
+        })
+        lines_list.append({
+            'line_id': line_id,
+            'time': next_start,
+            'stage': next_stage
+        })
+        line_id += 1
+
+    df_lines = pd.DataFrame(lines_list)
+
+    transitions = alt.Chart(df_lines).mark_line(
+        strokeDash=[2, 2],       # Dotted line
+        strokeWidth=2,          # Thicker stroke for visibility
+        interpolate='step-after' # Creates a step-like zigzag
+    ).encode(
+        x='time:T',
+        y=alt.Y('stage:N', sort=["wake", "rem", "light", "deep"]),
+        color=alt.Color('stage:N',
+                        scale=alt.Scale(domain=list(sleep_colors.keys()),
+                                        range=list(sleep_colors.values())),
+                        legend=None),
+        detail='line_id:N'
+    )
+
+    # 3) COMBINE bars + transitions (transitions drawn last -> on top)
+    chart = (bars + transitions).properties(
+        title="Sleep Stages Timeline",
+        width=600,
+        height=300
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
+###-----------   Plotting sleep stages trends --------------------
+def plot_sleep_trends(start_date, end_date, period='daily'):
+
+    date_range = pd.date_range(start=start_date, end=end_date)
+    records = []  # To collect aggregated daily data
+    
+    for dt in date_range:
+        date_str = dt.strftime("%Y-%m-%d")
+        sleep_json = load_sleep_data(date_str)
+        if sleep_json is None:
+            continue  # Skip if no file exists
+        df_sleep = process_sleep_data(sleep_json)
+        if df_sleep is None or df_sleep.empty:
+            continue
+        # Group by sleep stage and sum seconds for that day
+        grouped = df_sleep.groupby("level")["seconds"].sum().reset_index()
+        for _, row in grouped.iterrows():
+            records.append({
+                "date": dt,
+                "level": row["level"],
+                "seconds": row["seconds"]
+            })
+    
+    if not records:
+        # Return an empty chart if no data is found
+        return alt.Chart(pd.DataFrame()).mark_line().encode()
+    
+    df_trends = pd.DataFrame(records)
+    # Map internal levels to friendly labels
+    level_mapping = {"wake": "Awake", "rem": "REM", "light": "Light", "deep": "Deep"}
+    df_trends["stage"] = df_trends["level"].map(level_mapping)
+    df_trends["minutes"] = df_trends["seconds"] / 60.0
+    
+    # If weekly aggregation is requested, sum data by week
+    if period == 'weekly':
+        df_trends.set_index("date", inplace=True)
+        weekly = df_trends.groupby("stage").resample("W")["minutes"].sum().reset_index()
+        df_plot = weekly
+    else:
+        df_plot = df_trends.copy()
+    
+    chart = alt.Chart(df_plot).mark_line(point=True).encode(
+        x=alt.X("date:T", title="Date"),
+        y=alt.Y("minutes:Q", title="Total Minutes"),
+        color=alt.Color("stage:N", title="Sleep Stage",
+                        scale=alt.Scale(
+                            domain=["Awake", "REM", "Light", "Deep"],
+                            range=["#c19a6b", "#b19cd9", "#654ea3", "#000033"]
+                        )),
+        tooltip=[
+            alt.Tooltip("date:T", title="Date"),
+            alt.Tooltip("stage:N", title="Sleep Stage"),
+            alt.Tooltip("minutes:Q", title="Total Minutes", format=".1f")
+        ]
+    ).properties(
+        title=f"Sleep Stage Trends ({'Weekly' if period=='weekly' else 'Daily'})",
+        width=600,
+        height=400
+    )
+    
+    return chart
+def analyze_sleep_stage_transitions(df):
+    """
+    Analyzes sleep stage transitions from processed sleep data (df) and displays:
+      1. A Transition Probability Matrix as a heatmap.
+      2. Fragmentation Indices:
+         - Transitions per hour (total number of transitions divided by total sleep duration in hours).
+         - Count of A → B → A patterns (e.g., REM → Light → REM).
+         
+    Parameters:
+      df: DataFrame returned by process_sleep_data(), expected to have at least:
+           - 'level': sleep stage (e.g., "wake", "rem", "light", "deep")
+           - 'dateTime': start time of the sleep segment (as a datetime)
+           - 'seconds': duration (in seconds) of the sleep segment
+    """
+     # Ensure data is sorted by start time
+    df_sorted = df.sort_values("dateTime").reset_index(drop=True)
+    
+    # ----- Transition Probability Matrix -----
+    # Create a column for the next sleep stage
+    df_sorted["next_stage"] = df_sorted["level"].shift(-1)
+    
+    # Compute transition counts (rows: current stage, columns: next stage)
+    transition_counts = pd.crosstab(df_sorted["level"], df_sorted["next_stage"])
+    # Convert counts to probabilities by dividing each row by its sum
+    transition_prob = transition_counts.div(transition_counts.sum(axis=1), axis=0)
+    
+    # Prepare the data for the heatmap visualization
+    df_heat = transition_prob.reset_index().melt(
+        id_vars="level", var_name="next_stage", value_name="probability"
+    )
+    
+    heatmap = alt.Chart(df_heat).mark_rect().encode(
+        x=alt.X("next_stage:N", title="To Stage"),
+        y=alt.Y("level:N", title="From Stage"),
+        color=alt.Color("probability:Q", scale=alt.Scale(scheme="blues"), title="Probability"),
+        tooltip=[
+            alt.Tooltip("level:N", title="From Stage"),
+            alt.Tooltip("next_stage:N", title="To Stage"),
+            alt.Tooltip("probability:Q", title="Probability", format=".2f")
+        ]
+    ).properties(
+        title="Sleep Stage Transition Probability Matrix",
+        width=300,
+        height=300
+    )
+    
+    # ----- Fragmentation Metrics -----
+    # Total transitions (each change from one segment to the next)
+    total_transitions = len(df_sorted) - 1
+    
+    # Total sleep duration (in hours)
+    total_duration_hours = df_sorted["seconds"].sum() / 3600.0
+    transitions_per_hour = total_transitions / total_duration_hours if total_duration_hours > 0 else 0
+    
+    # Count the number of A → B → A patterns
+    pattern_count = 0
+    for i in range(len(df_sorted) - 2):
+        stage_a = df_sorted.iloc[i]["level"]
+        stage_b = df_sorted.iloc[i+1]["level"]
+        stage_a_next = df_sorted.iloc[i+2]["level"]
+        if stage_a == stage_a_next and stage_a != stage_b:
+            pattern_count += 1
+    
+    # Prepare fragmentation metrics data for visualization
+    frag_data = pd.DataFrame({
+        "Metric": ["Transitions per Hour", "A→B→A Patterns"],
+        "Value": [transitions_per_hour, pattern_count]
+    })
+    
+    frag_chart = alt.Chart(frag_data).mark_bar().encode(
+        x=alt.X("Metric:N", title="Fragmentation Metric"),
+        y=alt.Y("Value:Q", title="Value"),
+        color=alt.Color("Metric:N", scale=alt.Scale(range=["#654ea3", "#c19a6b"]))
+    ).properties(
+        title="Sleep Fragmentation Metrics",
+        width=300,
+        height=300
+    )
+    
+    # ----- Combine Visualizations -----
+    st.markdown("### Sleep Stage Transitions & Fragmentation Analysis")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.altair_chart(heatmap, use_container_width=True)
+    with col2:
+        st.altair_chart(frag_chart, use_container_width=True)
+    
+    # Optionally, display the raw metrics as text for clarity.
+    st.write("**Transitions per Hour:**", f"{transitions_per_hour:.2f}")
+    st.write("**A → B → A Patterns:**", pattern_count)
+    
+    return transition_prob, transitions_per_hour, pattern_count
+
+
+def plot_heart_rate_for_day(date_str, label):
     """
     Plot heart rate data for a given day (intraday data) using Streamlit's line_chart.
-    The JSON data is loaded from static/data for the given date and label.
     """
-    dataset = load_heart_rate_data_for_day(date, label)
+    dataset = load_heart_rate_data_for_day(date_str, label)
     if not dataset:
         st.warning("No heart rate data available.")
         return
@@ -250,35 +709,40 @@ def plot_heart_rate_for_day(date, label):
         st.warning("No valid heart rate data to plot.")
         return
     df_plot = df.reset_index().rename(columns={"time": "Time", "value": "Heart Rate"})
-    st.line_chart(
-        df_plot,
-        x="Time",
-        y=["Heart Rate"],
-        color=["#FF0000"]  # red color for the heart rate line
-    )
+    st.line_chart(df_plot.set_index("Time")["Heart Rate"])
 
-def plot_heart_rate_for_range(start_date, end_date):
+def plot_weekly_heart_rate():
     """
-    Plot heart rate summary data for a given date range (week trends) using Streamlit's line_chart.
-    The JSON data is loaded from static/data for the given date range.
-    (Assumes each day's summary is available under 'activities-heart' with a dateTime and a 'value'
-     dict containing, for example, a 'restingHeartRate'.)
+    Plot weekly heart rate trends using Streamlit's line_chart.
     """
-    dataset = load_heart_rate_data_for_range(start_date, end_date)
-    if not dataset:
-        st.warning("No heart rate data available for the week.")
+    weekly_data = load_weekly_heart_rate_data()
+    if not weekly_data:
+        st.warning("No heart rate data available for the past week.")
         return
-    df = pd.DataFrame(dataset)
-    # Extract a summary value (e.g. restingHeartRate) from the 'value' dictionary.
-    if not df.empty and isinstance(df.loc[0, "value"], dict):
-        df["Heart Rate"] = df["value"].apply(lambda x: x.get("restingHeartRate", None))
-    else:
-        df["Heart Rate"] = None
-    df["Time"] = pd.to_datetime(df["dateTime"])
-    df = df.dropna(subset=["Heart Rate"]).sort_values("Time")
-    st.line_chart(
-        df,
-        x="Time",
-        y=["Heart Rate"],
-        color=["#FF0000"]
-    )
+
+    data_list = []
+    for day, records in weekly_data.items():
+        for record in records:
+            data_list.append({"Time": f"{day} {record['time']}", "Heart Rate": record["value"]})
+
+    df = pd.DataFrame(data_list)
+    if df.empty:
+        st.warning("No valid heart rate data found for plotting.")
+        return
+    df["Time"] = pd.to_datetime(df["Time"])
+    df = df.sort_values("Time")
+    st.line_chart(df.set_index("Time")["Heart Rate"])
+
+def plot_rmssd_trends(date_str, label):
+    """
+    Load heart rate data, calculate RMSSD for 5-minute intervals, and plot the trends.
+    """
+    heart_rate_data = load_heart_rate_data_for_day(date_str, label)
+    if not heart_rate_data:
+        return
+    result = calculate_rmssd_for_5min_intervals(heart_rate_data)
+    if not result:
+        return
+    time_labels, rmssd_values = result
+    df_plot = pd.DataFrame({"Time": time_labels, "RMSSD": rmssd_values})
+    st.line_chart(df_plot.set_index("Time")["RMSSD"])
