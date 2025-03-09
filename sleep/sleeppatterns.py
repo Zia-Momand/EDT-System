@@ -12,7 +12,9 @@ import json
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import os
+import time
 from streamlit_echarts import st_echarts
+import plotly.graph_objects as go
 
 class SleepPattern:
     @staticmethod
@@ -354,3 +356,311 @@ def visualize_avg_sleep_data(avg_total_sleep, avg_stages):
     }
 
     st_echarts(options=option, height="500px")
+
+def calculate_sleep_efficiency_current_day(directory="static/data/sleep/") -> float:
+    """
+    Loads the current day's sleep JSON file (named as YYYY-MM-DD_sleep.json) and calculates sleep efficiency.
+    
+    Sleep Efficiency (%) = (totalMinutesAsleep / totalTimeInBed) * 100
+
+    Returns the efficiency percentage, or None if data is missing or an error occurs.
+    """
+    # Get today's date string in the format YYYY-MM-DD
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    file_path = os.path.join(directory, f"{today_str}_sleep.json")
+    
+    if not os.path.exists(file_path):
+        st.error("No sleep data available for the current day.")
+        return None
+
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        
+        # Navigate to the summary object
+        summary = data.get("summary", {})
+        total_minutes_asleep = summary.get("totalMinutesAsleep")
+        total_time_in_bed = summary.get("totalTimeInBed")
+        
+        if total_minutes_asleep is None or total_time_in_bed is None or total_time_in_bed == 0:
+            st.error("Insufficient sleep summary data.")
+            return None
+        
+        efficiency = (total_minutes_asleep / total_time_in_bed) * 100
+        return efficiency
+    except Exception as e:
+        st.error(f"Error processing sleep data: {e}")
+        return None
+    
+def analyze_sleep_quality(efficiency: float):
+    
+    # Determine quality based on efficiency
+    if efficiency >= 85:
+        quality = "Normal (Good sleep efficiency)"
+        message = "Your sleep efficiency is normal."
+        st.success(f"{quality}: {message}")
+    elif efficiency >= 75:
+        quality = "Mildly reduced sleep efficiency"
+        message = "Your sleep efficiency is mildly reduced. Consider reviewing your sleep habits."
+        st.warning(f"{quality}: {message}")
+    else:
+        quality = "Poor sleep efficiency (Indicative of sleep disturbances or disorders)"
+        message = "Your sleep efficiency is poor. You may want to consult a professional or review your sleep environment."
+        st.error(f"{quality}: {message}")
+
+    # Create a gauge chart using Plotly
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=efficiency,
+        number={'suffix': "%"},
+        title={'text': "Sleep Efficiency"},
+        gauge={
+            'axis': {'range': [0, 100]},
+            'bar': {'color': "darkblue"},
+            'steps': [
+                {'range': [0, 75], 'color': "red"},
+                {'range': [75, 85], 'color': "yellow"},
+                {'range': [85, 100], 'color': "green"}
+            ]
+        }
+    ))
+    st.plotly_chart(fig, use_container_width=True)
+
+def calculate_sleep_latency_current_day(directory="static/data/sleep/") -> float:
+    # Get today's date string in the format YYYY-MM-DD
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    file_path = os.path.join(directory, f"{today_str}_sleep.json")
+    
+    if not os.path.exists(file_path):
+        st.error("No sleep data available for the current day.")
+        return None
+
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        
+        # Assume sleep data is under the "sleep" key (take the first sleep record)
+        sleep_records = data.get("sleep", [])
+        if not sleep_records:
+            st.error("No sleep records found in today's data.")
+            return None
+        
+        sleep_record = sleep_records[0]
+        start_time_str = sleep_record.get("startTime")
+        if not start_time_str:
+            st.error("No startTime found in sleep record.")
+            return None
+        
+        # Convert startTime to a datetime object
+        start_time = datetime.fromisoformat(start_time_str.replace("Z", "+00:00"))
+        
+        # Retrieve levels data from the sleep record
+        levels_data = sleep_record.get("levels", {}).get("data", [])
+        if not levels_data:
+            st.error("No levels data found in sleep record.")
+            return None
+        
+        # Find the first event in levels that is not "wake"
+        sleep_onset_time = None
+        for event in levels_data:
+            level = event.get("level", "").lower()
+            if level != "wake":
+                dt_str = event.get("dateTime")
+                if dt_str:
+                    sleep_onset_time = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                    break
+        
+        if sleep_onset_time is None:
+            st.error("Could not determine sleep onset time from levels data.")
+            return None
+        
+        latency_seconds = (sleep_onset_time - start_time).total_seconds()
+        return latency_seconds
+    
+    except Exception as e:
+        st.error(f"Error processing sleep data: {e}")
+        return None
+    
+def count_awakenings_current_day(directory="static/data/sleep/") -> int:
+    # Construct today's file name based on the current date.
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    file_path = os.path.join(directory, f"{today_str}_sleep.json")
+    
+    if not os.path.exists(file_path):
+        st.error("No sleep data available for the current day.")
+        return None
+
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        
+        # Assume the sleep records are under the "sleep" key; take the first record.
+        sleep_records = data.get("sleep", [])
+        if not sleep_records:
+            st.error("No sleep records found for today.")
+            return None
+        
+        sleep_record = sleep_records[0]
+        levels_data = sleep_record.get("levels", {}).get("data", [])
+        if not levels_data:
+            st.error("No levels data found in today's sleep record.")
+            return None
+        
+        # Identify sleep onset: find the first event where level is not "wake".
+        first_sleep_index = None
+        for i, event in enumerate(levels_data):
+            if event.get("level", "").lower() != "wake":
+                first_sleep_index = i
+                break
+        
+        if first_sleep_index is None:
+            # No sleep detected.
+            return 0
+        
+        # Count transitions to "wake" after sleep onset.
+        count = 0
+        prev_level = levels_data[first_sleep_index].get("level", "").lower()
+        for event in levels_data[first_sleep_index+1:]:
+            curr_level = event.get("level", "").lower()
+            if curr_level == "wake" and prev_level != "wake":
+                count += 1
+            prev_level = curr_level
+        return count
+        
+    except Exception as e:
+        st.error(f"Error processing sleep data: {e}")
+        return None
+    
+#============  Sleep transion and fregramentation  ===============
+def analyze_sleep_stage_transitions(df):
+    """
+    Analyzes sleep stage transitions and fragmentation from processed sleep data,
+    and displays both visualizations and plain language interpretations in an info alert.
+    
+    **Algorithm:**
+    
+    1. Transition Probability Matrix:
+       - **Sort:** Order the sleep data by start time.
+       - **Shift:** Create a new column "next_stage" by shifting the 'level' column.
+       - **Count:** Use pd.crosstab() to count transitions from one stage to the next.
+       - **Normalize:** Divide each row by its sum to obtain the probability of transitioning 
+         from a given stage to another.
+       
+    2. Fragmentation Index:
+       - **Total Transitions:** Compute the number of transitions (number of segments minus one).
+       - **Duration:** Calculate the total sleep duration (in seconds) and convert it to hours.
+       - **Transitions per Hour:** Divide the total transitions by the total sleep duration (in hours).
+       - **Pattern Count:** Loop through the segments to count instances of A → B → A (where a stage is interrupted 
+         briefly by another stage and then returns), which indicates sleep fragmentation.
+    
+    **Visualizations:**
+      - A heatmap displays the transition probability matrix.
+      - A bar chart shows the fragmentation metrics.
+      
+    **Plain Language Interpretation:**
+      An info alert explains the results in simple terms so non-technical users can understand what the metrics imply about their sleep quality.
+    
+    Parameters:
+      df: DataFrame from process_sleep_data() with at least:
+          - 'level': Sleep stage (e.g., "wake", "rem", "light", "deep")
+          - 'dateTime': Start time of each segment (datetime)
+          - 'seconds': Duration (in seconds) of each segment
+    """
+    # --- Compute Transition Probability Matrix ---
+    df_sorted = df.sort_values("dateTime").reset_index(drop=True)
+    df_sorted["next_stage"] = df_sorted["level"].shift(-1)
+    
+    # Count transitions from each stage to the next
+    transition_counts = pd.crosstab(df_sorted["level"], df_sorted["next_stage"])
+    # Normalize counts to obtain probabilities (row-wise)
+    transition_prob = transition_counts.div(transition_counts.sum(axis=1), axis=0)
+    
+    # Prepare data for heatmap visualization
+    df_heat = transition_prob.reset_index().melt(
+        id_vars="level", var_name="next_stage", value_name="probability"
+    )
+    
+    heatmap = alt.Chart(df_heat).mark_rect().encode(
+        x=alt.X("next_stage:N", title="To Stage"),
+        y=alt.Y("level:N", title="From Stage"),
+        color=alt.Color("probability:Q", scale=alt.Scale(scheme="blues"), title="Probability"),
+        tooltip=[
+            alt.Tooltip("level:N", title="From Stage"),
+            alt.Tooltip("next_stage:N", title="To Stage"),
+            alt.Tooltip("probability:Q", title="Probability", format=".2f")
+        ]
+    ).properties(
+        title="Transition Probability Matrix",
+        width=300,
+        height=300
+    )
+    
+    # --- Compute Fragmentation Metrics ---
+    total_transitions = len(df_sorted) - 1
+    total_duration_seconds = df_sorted["seconds"].sum()
+    total_duration_hours = total_duration_seconds / 3600.0 if total_duration_seconds > 0 else 0
+    transitions_per_hour = total_transitions / total_duration_hours if total_duration_hours > 0 else 0
+    
+    # Count A → B → A patterns (indicator of fragmentation)
+    pattern_count = 0
+    for i in range(len(df_sorted) - 2):
+        stage_a = df_sorted.iloc[i]["level"]
+        stage_b = df_sorted.iloc[i+1]["level"]
+        stage_a_next = df_sorted.iloc[i+2]["level"]
+        if stage_a == stage_a_next and stage_a != stage_b:
+            pattern_count += 1
+    
+    # Prepare fragmentation metrics data for a bar chart
+    frag_data = pd.DataFrame({
+        "Metric": ["Transitions per Hour", "A→B→A Patterns"],
+        "Value": [transitions_per_hour, pattern_count]
+    })
+    
+    frag_chart = alt.Chart(frag_data).mark_bar().encode(
+        x=alt.X("Metric:N", title="Fragmentation Metric"),
+        y=alt.Y("Value:Q", title="Value"),
+        color=alt.Color("Metric:N", scale=alt.Scale(range=["#654ea3", "#c19a6b"]))
+    ).properties(
+        title="Sleep Fragmentation Metrics",
+        width=300,
+        height=300
+    )
+    
+    # --- Display Visualizations ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.altair_chart(heatmap, use_container_width=True)
+    with col2:
+        st.altair_chart(frag_chart, use_container_width=True)
+    
+    # --- Plain Language Interpretation in an Info Alert ---
+    interpretation = (
+        "**Transition Probability Matrix:**\n\n"
+        "This heatmap shows how frequently the older adults sleep moves from one stage to another. "
+        "High probabilities along expected paths (for example, from Light to REM or REM to Deep) indicate a stable, smooth sleep cycle. "
+        "If you observe frequent transitions from Light or REM directly to Awake, it may suggest disruptions in your elderly loved one's sleep.\n\n"
+        "**Fragmentation Metrics:**\n\n"
+        f"- **Transitions per Hour:** {transitions_per_hour:.2f}. A lower value indicates more consolidated sleep, "
+        "while a higher value suggests frequent interruptions.\n"
+        f"- **A → B → A Patterns:** {pattern_count}. This metric counts how often the an older adult briefly switch away from a sleep stage and then return to it, indicating possible sleep fragmentation.\n\n"
+        "Overall, fewer transitions and less fragmentation are signs of stable, restorative sleep. "
+        "If the elderly metrics indicate high fragmentation or many unexpected transitions, consider reviewing the sleep environment or habits, and consult a healthcare provider if needed."
+    )
+    with st.expander("See Interpretation"):
+         st.info(interpretation)
+    # Define the text to be animated in the dialog
+    _LOREM_IPSUM = (
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
+        "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, "
+        "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    )
+
+    # Define the dialog (using st.dialog) that will show the typewriter effect.
+    @st.dialog("AI-Generated Text")
+    def show_dialog():
+     st.markdown(f"<div>{_LOREM_IPSUM}</div>", unsafe_allow_html=True)
+
+    # When the button is clicked, call the dialog.
+    if st.button('Ask AI for Recommendation 💬', use_container_width=True):
+        show_dialog()
+    return transition_prob, transitions_per_hour, pattern_count

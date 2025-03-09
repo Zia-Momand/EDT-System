@@ -602,100 +602,6 @@ def plot_sleep_trends(start_date, end_date, period='daily'):
     )
     
     return chart
-def analyze_sleep_stage_transitions(df):
-    """
-    Analyzes sleep stage transitions from processed sleep data (df) and displays:
-      1. A Transition Probability Matrix as a heatmap.
-      2. Fragmentation Indices:
-         - Transitions per hour (total number of transitions divided by total sleep duration in hours).
-         - Count of A → B → A patterns (e.g., REM → Light → REM).
-         
-    Parameters:
-      df: DataFrame returned by process_sleep_data(), expected to have at least:
-           - 'level': sleep stage (e.g., "wake", "rem", "light", "deep")
-           - 'dateTime': start time of the sleep segment (as a datetime)
-           - 'seconds': duration (in seconds) of the sleep segment
-    """
-     # Ensure data is sorted by start time
-    df_sorted = df.sort_values("dateTime").reset_index(drop=True)
-    
-    # ----- Transition Probability Matrix -----
-    # Create a column for the next sleep stage
-    df_sorted["next_stage"] = df_sorted["level"].shift(-1)
-    
-    # Compute transition counts (rows: current stage, columns: next stage)
-    transition_counts = pd.crosstab(df_sorted["level"], df_sorted["next_stage"])
-    # Convert counts to probabilities by dividing each row by its sum
-    transition_prob = transition_counts.div(transition_counts.sum(axis=1), axis=0)
-    
-    # Prepare the data for the heatmap visualization
-    df_heat = transition_prob.reset_index().melt(
-        id_vars="level", var_name="next_stage", value_name="probability"
-    )
-    
-    heatmap = alt.Chart(df_heat).mark_rect().encode(
-        x=alt.X("next_stage:N", title="To Stage"),
-        y=alt.Y("level:N", title="From Stage"),
-        color=alt.Color("probability:Q", scale=alt.Scale(scheme="blues"), title="Probability"),
-        tooltip=[
-            alt.Tooltip("level:N", title="From Stage"),
-            alt.Tooltip("next_stage:N", title="To Stage"),
-            alt.Tooltip("probability:Q", title="Probability", format=".2f")
-        ]
-    ).properties(
-        title="Sleep Stage Transition Probability Matrix",
-        width=300,
-        height=300
-    )
-    
-    # ----- Fragmentation Metrics -----
-    # Total transitions (each change from one segment to the next)
-    total_transitions = len(df_sorted) - 1
-    
-    # Total sleep duration (in hours)
-    total_duration_hours = df_sorted["seconds"].sum() / 3600.0
-    transitions_per_hour = total_transitions / total_duration_hours if total_duration_hours > 0 else 0
-    
-    # Count the number of A → B → A patterns
-    pattern_count = 0
-    for i in range(len(df_sorted) - 2):
-        stage_a = df_sorted.iloc[i]["level"]
-        stage_b = df_sorted.iloc[i+1]["level"]
-        stage_a_next = df_sorted.iloc[i+2]["level"]
-        if stage_a == stage_a_next and stage_a != stage_b:
-            pattern_count += 1
-    
-    # Prepare fragmentation metrics data for visualization
-    frag_data = pd.DataFrame({
-        "Metric": ["Transitions per Hour", "A→B→A Patterns"],
-        "Value": [transitions_per_hour, pattern_count]
-    })
-    
-    frag_chart = alt.Chart(frag_data).mark_bar().encode(
-        x=alt.X("Metric:N", title="Fragmentation Metric"),
-        y=alt.Y("Value:Q", title="Value"),
-        color=alt.Color("Metric:N", scale=alt.Scale(range=["#654ea3", "#c19a6b"]))
-    ).properties(
-        title="Sleep Fragmentation Metrics",
-        width=300,
-        height=300
-    )
-    
-    # ----- Combine Visualizations -----
-    st.markdown("### Sleep Stage Transitions & Fragmentation Analysis")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.altair_chart(heatmap, use_container_width=True)
-    with col2:
-        st.altair_chart(frag_chart, use_container_width=True)
-    
-    # Optionally, display the raw metrics as text for clarity.
-    st.write("**Transitions per Hour:**", f"{transitions_per_hour:.2f}")
-    st.write("**A → B → A Patterns:**", pattern_count)
-    
-    return transition_prob, transitions_per_hour, pattern_count
-
-
 def plot_heart_rate_for_day(date_str, label):
     """
     Plot heart rate data for a given day (intraday data) using Streamlit's line_chart.
@@ -746,3 +652,43 @@ def plot_rmssd_trends(date_str, label):
     time_labels, rmssd_values = result
     df_plot = pd.DataFrame({"Time": time_labels, "RMSSD": rmssd_values})
     st.line_chart(df_plot.set_index("Time")["RMSSD"])
+
+
+    #================== Get SpO2 data ============================
+
+def fetch_spo2_data():
+    """
+    Fetch SPO2 data from the Fitbit API for today's date and save it as a JSON file.
+    Uses get_valid_tokens() to retrieve stored Fitbit tokens.
+    
+    The JSON file is saved in the folder static/data/spo2 as {current_date}_spo2.json.
+    
+    Returns:
+      dict: The SPO2 data retrieved from the Fitbit API, or None if an error occurs.
+    """
+    current_date1 = datetime.today().strftime("%Y-%m-%d")
+    tokens = get_valid_tokens()
+    current_date ="2025-03-09"
+
+    access_token = tokens.get("access_token")
+    if not access_token:
+        st.error("Missing access token in stored tokens.")
+        return None
+
+    # Construct the correct Fitbit SPO2 API endpoint URL
+    FITBIT_SPO2_API = f"https://api.fitbit.com/1/user/-/spo2/date/{current_date}/all.json"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(FITBIT_SPO2_API, headers=headers)
+
+    if response.status_code == 200:
+        spo2_data = response.json()
+        # Create the target folder if it doesn't exist
+        folder = os.path.join("static", "data", "spo2")
+        os.makedirs(folder, exist_ok=True)
+        file_path = os.path.join(folder, f"{current_date}_spo2.json")
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(spo2_data, f, indent=4)
+        return spo2_data
+    else:
+        st.error(f"Failed to fetch SPO2 data: {response.status_code} - {response.text}")
+        return None

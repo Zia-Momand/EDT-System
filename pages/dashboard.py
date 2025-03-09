@@ -10,6 +10,8 @@ import pandas as pd
 from langchain.chat_models import ChatOpenAI
 from langchain import PromptTemplate, LLMChain
 import streamlit_antd_components as sac
+from streamlit_extras.colored_header import colored_header
+from spo2.spo2patterns import SPO2Analyzer
 
 # # Load environment variables from the .env file
 load_dotenv()
@@ -21,6 +23,11 @@ from sleep.sleeppatterns import(
     calculate_average_sleep_duration,
     analyze_average_stages,
     visualize_avg_sleep_data,
+    calculate_sleep_efficiency_current_day,
+    analyze_sleep_quality,
+    calculate_sleep_latency_current_day,
+    count_awakenings_current_day,
+    analyze_sleep_stage_transitions,
 
 )
 from config import (
@@ -36,7 +43,7 @@ from config import (
     fetch_sleep_data,
     load_sleep_data,
     plot_sleep_trends,
-    analyze_sleep_stage_transitions,
+    fetch_spo2_data,
 )
 openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # --- Define a LangChain-based recommendation function ---
@@ -246,18 +253,69 @@ if st.session_state["menu_option"] == "trends":
                     st.altair_chart(chart, use_container_width=True)
                                 
                 with row2_col2:
-                    st.markdown("##### Sleep Patterns")
-                    #analyze_sleep_stage_transitions(df_sleep)
+                    colored_header(
+                        label= "Weekly Sleep Analysis",
+                        description = "Average Sleep Analysis",
+                        color_name=  "yellow-80",
+                    )
                     week_data = load_sleep_data_for_week()
                     total_avg_duration = calculate_average_sleep_duration(week_data)
                     total_avg_each_stage_duration = analyze_average_stages(week_data)
                     visualize_avg_sleep_data(total_avg_duration, total_avg_each_stage_duration)
-                   
+            with st.container():
+                row3_col1, row3_col2 = st.columns(2)
+                with row3_col1:
+                    colored_header(
+                        label= "Sleep Metrics",
+                        description = "Sleep Metrics",
+                        color_name=  "yellow-80",
+                    )
+                    efficiency = calculate_sleep_efficiency_current_day()  # your existing function
+                    if efficiency is not None:
+                        analyze_sleep_quality(efficiency)
+                    with st.container():
+                        row_subcol1, row_subcol2 = st.columns(2)
+                        with row_subcol1:
+                            st.markdown(
+                                    """
+                                    <style>
+                                    div[data-testid="stMetricValue"] {
+                                        font-size: 25px !important;
+                                    }
+                                    div[data-testid="stMetricLabel"] {
+                                        font-size: 25px !important;
+                                    }
+                                    </style>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                            latency = calculate_sleep_latency_current_day()
+                            if latency is not None:
+                                st.metric("Sleep Latency", f"{latency:.0f} seconds ({latency/60:.1f} minutes)")
+                        with row_subcol2:
+                            num_awakenings = count_awakenings_current_day()
+                            if num_awakenings is not None:
+                                st.metric("Number of Awakenings", f"{num_awakenings} times")
+                with row3_col2: 
+                    colored_header(
+                        label= "Sleep Transition and Fregementations",
+                        description = "Sleep Transition and Fregementations",
+                        color_name=  "yellow-80",
+                    ) 
+                    analyze_sleep_stage_transitions(df_sleep) 
               
         # SPO2 Analysis Tab (Placeholder)
         with tab2:
-            st.subheader("SPO2 Levels Analysis (Coming Soon)")
-            st.info("This feature will analyze blood oxygen saturation (SpO2) during sleep.")
+            st.subheader("SPO2 Levels Analysis")
+            with st.container():
+                sp_row1, sp_row2 = st.columns(2)
+                with sp_row1:
+                    fetch_spo2_data()
+                    SPO2Analyzer.plot_spo2_last_night()
+                with sp_row2:
+                    st.info('coming soon')
+
+            
             # Sleep benchmarks
 
 
