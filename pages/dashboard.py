@@ -12,6 +12,7 @@ from langchain import PromptTemplate, LLMChain
 import streamlit_antd_components as sac
 from streamlit_extras.colored_header import colored_header
 from spo2.spo2patterns import SPO2Analyzer
+from streamlit_echarts import st_echarts
 
 # # Load environment variables from the .env file
 load_dotenv()
@@ -306,14 +307,15 @@ if st.session_state["menu_option"] == "trends":
               
         # SPO2 Analysis Tab (Placeholder)
         with tab2:
-            st.subheader("SPO2 Levels Analysis")
+            st.subheader("Blood Oxygen Saturation Analysis During Sleep")
             with st.container():
                 sp_row1, sp_row2 = st.columns(2)
                 with sp_row1:
                     fetch_spo2_data()
                     SPO2Analyzer.plot_spo2_last_night()
+                    SPO2Analyzer.plot_spo2_liquid_fill()
                 with sp_row2:
-                    st.info('coming soon')
+                    SPO2Analyzer.plot_hr_spo2_last_night()
 
             
             # Sleep benchmarks

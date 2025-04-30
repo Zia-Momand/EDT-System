@@ -666,9 +666,10 @@ def fetch_spo2_data():
     Returns:
       dict: The SPO2 data retrieved from the Fitbit API, or None if an error occurs.
     """
-    current_date1 = datetime.today().strftime("%Y-%m-%d")
+    #current_date = datetime.today().strftime("%Y-%m-%d")
+    yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
     tokens = get_valid_tokens()
-    current_date ="2025-03-09"
+    #current_date ="2025-03-09"
 
     access_token = tokens.get("access_token")
     if not access_token:
@@ -676,7 +677,7 @@ def fetch_spo2_data():
         return None
 
     # Construct the correct Fitbit SPO2 API endpoint URL
-    FITBIT_SPO2_API = f"https://api.fitbit.com/1/user/-/spo2/date/{current_date}/all.json"
+    FITBIT_SPO2_API = f"https://api.fitbit.com/1/user/-/spo2/date/{yesterday}/all.json"
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(FITBIT_SPO2_API, headers=headers)
 
@@ -685,7 +686,7 @@ def fetch_spo2_data():
         # Create the target folder if it doesn't exist
         folder = os.path.join("static", "data", "spo2")
         os.makedirs(folder, exist_ok=True)
-        file_path = os.path.join(folder, f"{current_date}_spo2.json")
+        file_path = os.path.join(folder, f"{yesterday}_spo2.json")
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(spo2_data, f, indent=4)
         return spo2_data

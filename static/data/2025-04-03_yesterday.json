@@ -1,0 +1,45 @@
+{
+  "activities-heart": [
+    {
+      "dateTime": "2025-04-03",
+      "value": {
+        "customHeartRateZones": [],
+        "heartRateZones": [
+          {
+            "caloriesOut": 1728.288,
+            "max": 111,
+            "min": 30,
+            "minutes": 1440,
+            "name": "Out of Range"
+          },
+          {
+            "caloriesOut": 0,
+            "max": 135,
+            "min": 111,
+            "minutes": 0,
+            "name": "Fat Burn"
+          },
+          {
+            "caloriesOut": 0,
+            "max": 165,
+            "min": 135,
+            "minutes": 0,
+            "name": "Cardio"
+          },
+          {
+            "caloriesOut": 0,
+            "max": 220,
+            "min": 165,
+            "minutes": 0,
+            "name": "Peak"
+          }
+        ]
+      }
+    }
+  ],
+  "activities-heart-intraday": {
+    "dataset": [],
+    "datasetInterval": 1,
+    "datasetType": "minute"
+  }
+}
