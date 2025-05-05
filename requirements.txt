@@ -12,3 +12,11 @@ mysql-connector-python  # MySQL support
 streamlit
 openai
 langchain
+bcrypt
+python-dotenv
+pyngrok
+langchain-community
+supabase
+streamlit-antd-components
+streamlit-echarts
+streamlit-extra
