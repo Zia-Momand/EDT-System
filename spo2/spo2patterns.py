@@ -10,19 +10,97 @@ class SPO2Analyzer:
     def __init__(self):
         pass
     @staticmethod
-    def plot_spo2_last_night():
+    def load_spo2_data():
         yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
         file_path = os.path.join("static", "data", "spo2", f"{yesterday}_spo2.json")
-        
+
         if not os.path.exists(file_path):
-            st.warning(f"No SPO2 data found for {yesterday}.")
-            return
-        
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
+            #st.warning(f"No SPO2 data found for {yesterday}. Searching for the latest available file before today...")
+
+            def extract_date(filename):
+                try:
+                    return datetime.strptime(filename.split("_")[0], "%Y-%m-%d")
+                except Exception:
+                    return None
+
+            # List and filter valid SPO2 files with date before today
+            files = [
+                f for f in os.listdir("static/data/spo2")
+                if f.endswith("_spo2.json") and extract_date(f) is not None and extract_date(f) < datetime.today()
+            ]
+
+            if not files:
+                st.error("No previous SPO2 data files available.")
+                return None
+
+            # Sort by date descending and use the latest one
+            latest_file = sorted(files, key=extract_date, reverse=True)[0]
+            file_path = os.path.join("static", "data", "spo2", latest_file)
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Failed to load SPO2 data: {e}")
+            return None
+
+    @staticmethod
+    def load_weekly_spo2_data():
+        end_date = datetime.today() - timedelta(days=1)  # Assume last full day
+        start_date = end_date - timedelta(days=6)
+        date_range = pd.date_range(start=start_date, end=end_date)
+        all_records = []
+
+        # Try to load files for the full past week
+        for dt in date_range:
+            date_str = dt.strftime("%Y-%m-%d")
+            file_path = os.path.join("static", "data", "spo2", f"{date_str}_spo2.json")
+            if os.path.exists(file_path):
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                for rec in data["spo2"]:
+                    rec["date"] = data["date"]
+                    rec["time_dt"] = pd.to_datetime(data["date"] + " " + rec["time"])
+                all_records.extend(data["spo2"])
+
+        # Fallback if no data or partial data found
+        if len(all_records) < 100:
+            st.warning("Weekly SPO2 data not complete. Loading latest available 7 days instead.")
+
+            def extract_date(filename):
+                try:
+                    return datetime.strptime(filename.split("_")[0], "%Y-%m-%d")
+                except Exception:
+                    return None
+            try:
+                files = [
+                    f for f in os.listdir("static/data/spo2")
+                    if f.endswith("_spo2.json") and extract_date(f) is not None
+                ]
+                sorted_files = sorted(files, key=extract_date, reverse=True)
+
+                all_records = []  # Clear any partial data
+                for file in sorted_files[:7]:  # Pick the latest 7 files
+                    file_path = os.path.join("static", "data", "spo2", file)
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    for rec in data["spo2"]:
+                        rec["date"] = data["date"]
+                        rec["time_dt"] = pd.to_datetime(data["date"] + " " + rec["time"])
+                    all_records.extend(data["spo2"])
+            except Exception as e:
+                st.error(f"Error during fallback loading: {e}")
+                return None
+
+        if not all_records:
+            st.warning("No SPO2 data available.")
+            return None
+
+        return all_records
+    @staticmethod
+    def plot_spo2_last_night(spo2_data):
         # New data format: use "dateTime" and "minutes" keys.
-        df = pd.DataFrame(data["minutes"])
+        df = pd.DataFrame(spo2_data["minutes"])
         # Convert the "minute" field to a datetime column.
         df["time_dt"] = pd.to_datetime(df["minute"])
         
@@ -34,7 +112,7 @@ class SPO2Analyzer:
                 alt.Tooltip("value:Q", title="SPO2")
             ]
         ).properties(
-            title=f"SPO2 Levels for Last Night ({data['dateTime']})",
+            title=f"SPO2 Levels for Last Night ({spo2_data['dateTime']})",
             width=600,
             height=300
         )
@@ -42,27 +120,7 @@ class SPO2Analyzer:
         st.altair_chart(chart, use_container_width=True)
     @staticmethod
     def plot_spo2_weekly():
-        end_date = datetime.today() - timedelta(days=1)  # assume last full day
-        start_date = end_date - timedelta(days=6)
-        date_range = pd.date_range(start=start_date, end=end_date)
-        all_records = []
-        
-        for dt in date_range:
-            date_str = dt.strftime("%Y-%m-%d")
-            file_path = os.path.join("static", "data", "spo2", f"{date_str}_spo2.json")
-            if os.path.exists(file_path):
-                with open(file_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                for rec in data["spo2"]:
-                    rec["date"] = data["date"]
-                    # Create a combined datetime column.
-                    rec["time_dt"] = pd.to_datetime(data["date"] + " " + rec["time"])
-                all_records.extend(data["spo2"])
-        
-        if not all_records:
-            st.warning("No SPO2 data available for the last week.")
-            return
-        
+        all_records = SPO2Analyzer.load_weekly_spo2_data()
         df_week = pd.DataFrame(all_records)
         
         chart = alt.Chart(df_week).mark_line(point=True).encode(
@@ -85,18 +143,9 @@ class SPO2Analyzer:
 # ------------------------------
 #======== MAX, Min , and Avg SPO2 levels =====================
     @staticmethod
-    def plot_spo2_liquid_fill(date_str=None):
+    def plot_spo2_liquid_fill():
         
-        if date_str is None:
-            date_str = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-            
-        file_path = os.path.join("static", "data", "spo2", f"{date_str}_spo2.json")
-        if not os.path.exists(file_path):
-            st.warning(f"No SPO2 data found for {date_str}.")
-            return
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        data = SPO2Analyzer.load_spo2_data()
         
         # Create a DataFrame from the 'minutes' list
         df = pd.DataFrame(data["minutes"])
@@ -286,30 +335,71 @@ class SPO2Analyzer:
             tolerance=pd.Timedelta("60s")
         )
 
-        # Drop rows with no HR match
         aligned_df.dropna(subset=["HR"], inplace=True)
 
+        # --- Compute pattern labels ---
+        spo2_mean = aligned_df['SpO2'].mean()
+        hr_mean = aligned_df['HR'].mean()
+
+        def classify_pattern(row):
+            spo2, hr = row['SpO2'], row['HR']
+            if spo2 < 90 and hr > 100:
+                return "SpO2↓ + HR↑ (Hypoxic stress)"
+            elif spo2 < 90 and hr < 60:
+                return "SpO2↓ + HR↓ (Bradycardic hypoxemia)"
+            elif spo2 > 95 and hr > 110:
+                return "SpO2↑ + HR↑ (Arousal spike)"
+            elif spo2 < 90 and 60 <= hr <= 90:
+                return "Low SpO2 + Stable HR (Blunted reflex)"
+            elif spo2 >= 95 and hr < 50:
+                return "Normal SpO2 + Low HR (Deep sleep bradycardia)"
+            elif abs(spo2 - spo2_mean) > 3 and abs(hr - hr_mean) > 10:
+                return "High variability"
+            else:
+                return "Normal"
+
+        aligned_df["Pattern"] = aligned_df.apply(classify_pattern, axis=1)
+
+        # --- Display alerts based on detected patterns ---
+        detected_patterns = aligned_df["Pattern"].unique().tolist()
+        abnormal_patterns = [p for p in detected_patterns if p != "Normal"]
+
+        if abnormal_patterns:
+            for pattern in abnormal_patterns:
+                st.warning(f"⚠️ Detected abnormal pattern: **{pattern}**")
+            
+            # Optional: count each pattern
+            pattern_counts = aligned_df["Pattern"].value_counts()
+            for pat, count in pattern_counts.items():
+                st.info(f"🧭 {pat}: {count} instance(s)")
+
+        else:
+            st.success("✅ All readings are within normal ranges.")
+
         # --- Plot both HR and SpO2 ---
-        spo2_line = alt.Chart(aligned_df).mark_line(color="#1976d2").encode(
-            x=alt.X("time_dt:T", title="Time"),
+        base = alt.Chart(aligned_df).encode(x=alt.X("time_dt:T", title="Time"))
+
+        spo2_line = base.mark_line(color="#1976d2").encode(
             y=alt.Y("SpO2:Q", title="SpO₂ (%)", scale=alt.Scale(domain=[80, 100])),
-            tooltip=[alt.Tooltip("time_dt:T", title="Time", format="%H:%M"),
-                    alt.Tooltip("SpO2:Q", title="SpO₂")],
+            tooltip=["time_dt:T", "SpO2", "HR", "Pattern"]
         )
 
-        hr_line = alt.Chart(aligned_df).mark_line(color="#f44336").encode(
-            x=alt.X("time_dt:T"),
-            y=alt.Y("HR:Q", title="Heart Rate (BPM)", scale=alt.Scale(domain=[50, 130])),
-            tooltip=[alt.Tooltip("HR:Q", title="Heart Rate (BPM)")],
+        hr_line = base.mark_line(color="#f44336").encode(
+            y=alt.Y("HR:Q", title="Heart Rate (BPM)", scale=alt.Scale(domain=[50, 140])),
+            tooltip=["time_dt:T", "SpO2", "HR", "Pattern"]
         )
 
         chart = alt.layer(spo2_line, hr_line).resolve_scale(y='independent').properties(
-            title=f"SPO₂ and Heart Rate Trends on {yesterday}",
-            width=700,
+            title=f"SpO₂ & Heart Rate Patterns on {yesterday}",
+            width=800,
             height=350
         )
 
         st.altair_chart(chart, use_container_width=True)
+
+
+
+
 
         
 

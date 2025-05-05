@@ -1,6 +1,5 @@
 import psycopg2
 import bcrypt
-import streamlit as st
 
 # PostgreSQL Connection Settings
 DB_PARAMS = {
@@ -43,13 +42,25 @@ def register_user(first_name, last_name, username, password):
 def login_user(username, password):
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()
-    
+    # grab first_name, last_name, and hashed password
+    cursor.execute(
+        "SELECT first_name, last_name, password FROM users WHERE username = %s",
+        (username,),
+    )
+    result = cursor.fetchone()
     cursor.close()
     conn.close()
 
-    if user:
-        return bcrypt.checkpw(password.encode(), user[0].encode())
-    return False
+    if not result:
+        return None
+
+    first_name, last_name, hashed_pw = result
+    if bcrypt.checkpw(password.encode(), hashed_pw.encode()):
+        # return a dict with the bits you need
+        return {
+            "username":   username,
+            "first_name": first_name,
+            "last_name":  last_name
+        }
+
+    return None

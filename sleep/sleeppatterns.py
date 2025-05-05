@@ -185,58 +185,84 @@ class SleepPattern:
 def load_sleep_data_for_week(directory="static/data/sleep"):
     """
     Loads sleep data for the past 7 days (today and the previous 6 days) from JSON files.
-    Files are expected to be named in the format 'YYYY-MM-DD_sleep.json'.
-    
-    Extracted fields for each day:
-      - date: date of sleep (dateOfSleep)
-      - minutesAsleep: total sleep duration in minutes
-      - deep, light, rem, wake: minutes for each sleep stage from levels.summary
-    
+    If no recent files are found, loads data from the latest available file and the previous 6 files by date.
+
     Returns:
-      pd.DataFrame: DataFrame containing sleep data for each day.
+        pd.DataFrame: DataFrame containing sleep data.
     """
-    data_list = []
-    today = datetime.today()
+    def parse_date_from_filename(filename):
+        try:
+            return datetime.strptime(filename.split("_")[0], "%Y-%m-%d")
+        except ValueError:
+            return None
+
+    # Get all available sleep data files
+    all_files = [
+        f for f in os.listdir(directory)
+        if f.endswith("_sleep.json") and parse_date_from_filename(f)
+    ]
     
-    # Loop through today and the previous 6 days
-    for i in range(7):
-        day = today - timedelta(days=i)
-        date_str = day.strftime("%Y-%m-%d")
-        file_name = f"{date_str}_sleep.json"
+    # Sort files by date (newest to oldest)
+    sorted_files = sorted(
+        all_files,
+        key=lambda f: parse_date_from_filename(f),
+        reverse=True
+    )
+
+    # Attempt to load today's data and previous 6 days
+    today = datetime.today()
+    target_dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    target_files = [f"{date}_sleep.json" for date in target_dates]
+
+    data_list = []
+    loaded_files = set()
+
+    for file_name in target_files:
         file_path = os.path.join(directory, file_name)
-        
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
                 json_data = json.load(f)
-                # Ensure the JSON contains sleep records
                 if "sleep" in json_data and json_data["sleep"]:
-                    record = json_data["sleep"][0]  # Use the first sleep record
-                    date_of_sleep = record.get("dateOfSleep", date_str)
+                    record = json_data["sleep"][0]
+                    date_of_sleep = record.get("dateOfSleep", file_name.split("_")[0])
                     minutes_asleep = record.get("minutesAsleep", 0)
-                    
-                    # Extract sleep stage durations from the levels summary
-                    levels = record.get("levels", {})
-                    summary = levels.get("summary", {})
-                    deep = summary.get("deep", {}).get("minutes", 0)
-                    light = summary.get("light", {}).get("minutes", 0)
-                    rem   = summary.get("rem", {}).get("minutes", 0)
-                    wake  = summary.get("wake", {}).get("minutes", 0)
-                    
+                    levels = record.get("levels", {}).get("summary", {})
                     data_list.append({
                         "date": date_of_sleep,
                         "minutesAsleep": minutes_asleep,
-                        "deep": deep,
-                        "light": light,
-                        "rem": rem,
-                        "wake": wake
+                        "deep": levels.get("deep", {}).get("minutes", 0),
+                        "light": levels.get("light", {}).get("minutes", 0),
+                        "rem": levels.get("rem", {}).get("minutes", 0),
+                        "wake": levels.get("wake", {}).get("minutes", 0)
                     })
-        else:
-            print(f"File not found: {file_path}")
-    
-    # Sort the data by date (oldest first)
+                    loaded_files.add(file_name)
+
+    # If not enough data loaded, use fallback: last 7 available files
+    if len(data_list) < 7:
+        print("Not enough recent data found. Using last 7 available files instead.")
+        data_list = []
+        for file_name in sorted_files[:7]:
+            if file_name not in loaded_files:
+                file_path = os.path.join(directory, file_name)
+                with open(file_path, "r") as f:
+                    json_data = json.load(f)
+                    if "sleep" in json_data and json_data["sleep"]:
+                        record = json_data["sleep"][0]
+                        date_of_sleep = record.get("dateOfSleep", file_name.split("_")[0])
+                        minutes_asleep = record.get("minutesAsleep", 0)
+                        levels = record.get("levels", {}).get("summary", {})
+                        data_list.append({
+                            "date": date_of_sleep,
+                            "minutesAsleep": minutes_asleep,
+                            "deep": levels.get("deep", {}).get("minutes", 0),
+                            "light": levels.get("light", {}).get("minutes", 0),
+                            "rem": levels.get("rem", {}).get("minutes", 0),
+                            "wake": levels.get("wake", {}).get("minutes", 0)
+                        })
+
+    # Sort by date before returning
     data_list = sorted(data_list, key=lambda x: x["date"])
-    df = pd.DataFrame(data_list)
-    return df
+    return pd.DataFrame(data_list)
 def calculate_average_sleep_duration(df):
     if df.empty:
         return 0
@@ -357,28 +383,19 @@ def visualize_avg_sleep_data(avg_total_sleep, avg_stages):
 
     st_echarts(options=option, height="500px")
 
-def calculate_sleep_efficiency_current_day(directory="static/data/sleep/") -> float:
+def calculate_sleep_efficiency_current_day(sleep_data) -> float:
     """
     Loads the current day's sleep JSON file (named as YYYY-MM-DD_sleep.json) and calculates sleep efficiency.
     
     Sleep Efficiency (%) = (totalMinutesAsleep / totalTimeInBed) * 100
 
     Returns the efficiency percentage, or None if data is missing or an error occurs.
-    """
-    # Get today's date string in the format YYYY-MM-DD
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    file_path = os.path.join(directory, f"{today_str}_sleep.json")
-    
-    if not os.path.exists(file_path):
-        st.error("No sleep data available for the current day.")
-        return None
+    """   
 
     try:
-        with open(file_path, "r") as f:
-            data = json.load(f)
-        
+    
         # Navigate to the summary object
-        summary = data.get("summary", {})
+        summary = sleep_data.get("summary", {})
         total_minutes_asleep = summary.get("totalMinutesAsleep")
         total_time_in_bed = summary.get("totalTimeInBed")
         
@@ -426,21 +443,11 @@ def analyze_sleep_quality(efficiency: float):
     ))
     st.plotly_chart(fig, use_container_width=True)
 
-def calculate_sleep_latency_current_day(directory="static/data/sleep/") -> float:
-    # Get today's date string in the format YYYY-MM-DD
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    file_path = os.path.join(directory, f"{today_str}_sleep.json")
-    
-    if not os.path.exists(file_path):
-        st.error("No sleep data available for the current day.")
-        return None
-
+def calculate_sleep_latency_current_day(sleep_data) -> float:
+   
     try:
-        with open(file_path, "r") as f:
-            data = json.load(f)
-        
         # Assume sleep data is under the "sleep" key (take the first sleep record)
-        sleep_records = data.get("sleep", [])
+        sleep_records = sleep_data.get("sleep", [])
         if not sleep_records:
             st.error("No sleep records found in today's data.")
             return None
@@ -481,21 +488,12 @@ def calculate_sleep_latency_current_day(directory="static/data/sleep/") -> float
         st.error(f"Error processing sleep data: {e}")
         return None
     
-def count_awakenings_current_day(directory="static/data/sleep/") -> int:
-    # Construct today's file name based on the current date.
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    file_path = os.path.join(directory, f"{today_str}_sleep.json")
-    
-    if not os.path.exists(file_path):
-        st.error("No sleep data available for the current day.")
-        return None
-
+def count_awakenings_current_day(sleep_data) -> int:
+   
     try:
-        with open(file_path, "r") as f:
-            data = json.load(f)
         
         # Assume the sleep records are under the "sleep" key; take the first record.
-        sleep_records = data.get("sleep", [])
+        sleep_records = sleep_data.get("sleep", [])
         if not sleep_records:
             st.error("No sleep records found for today.")
             return None

@@ -1,3 +1,4 @@
+import streamlit as st
 # heart_config.py
 import os
 import json
@@ -7,7 +8,7 @@ import base64
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date, timedelta, datetime
-import streamlit as st
+
 import numpy as np
 import plotly.express as px
 import altair as alt
@@ -23,73 +24,73 @@ TOKEN_URI = "https://api.fitbit.com/oauth2/token"
 TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
 
 # ----- OAuth Flow Functions --------------------------------------------------
-def get_fitbit_auth_url():
-    """
-    Generate and return the Fitbit OAuth2 URL for user authorization.
-    """
-    scope = ("heartrate activity oxygen_saturation electrocardiogram "
-             "cardio_fitness sleep respiratory_rate activity temperature")
-    response_type = "code"
-    auth_url = (
-        f"{AUTHORIZATION_URI}"
-        f"?response_type={response_type}"
-        f"&client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}"
-        f"&scope={scope}"
-        f"&expires_in=604800"  # token expiration in seconds (optional)
-    )
-    return auth_url
+#def get_fitbit_auth_url():
+    #"""
+    #Generate and return the Fitbit OAuth2 URL for user authorization.
+    #"""
+    #scope = ("heartrate activity oxygen_saturation electrocardiogram "
+             #"cardio_fitness sleep respiratory_rate activity temperature")
+    #response_type = "code"
+    #auth_url = (
+        #f"{AUTHORIZATION_URI}"
+        #f"?response_type={response_type}"
+        #f"&client_id={CLIENT_ID}"
+        #f"&redirect_uri={REDIRECT_URI}"
+        #f"&scope={scope}"
+        #f"&expires_in=604800"  # token expiration in seconds (optional)
+    #)
+    #return auth_url
 
-def exchange_code_for_tokens(code):
-    """
-    Exchange the provided authorization code for access and refresh tokens.
-    Adds an 'iat' timestamp to the tokens for expiration checking.
-    """
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
-    }
-    data = {
-        "client_id": CLIENT_ID,
-        "grant_type": "authorization_code",
-        "redirect_uri": REDIRECT_URI,
-        "code": code,
-    }
+# def exchange_code_for_tokens(code):
+#     """
+#     Exchange the provided authorization code for access and refresh tokens.
+#     Adds an 'iat' timestamp to the tokens for expiration checking.
+#     """
+#     headers = {
+#         "Content-Type": "application/x-www-form-urlencoded",
+#         "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
+#     }
+#     data = {
+#         "client_id": CLIENT_ID,
+#         "grant_type": "authorization_code",
+#         "redirect_uri": REDIRECT_URI,
+#         "code": code,
+#     }
 
-    response = requests.post(TOKEN_URI, headers=headers, data=data)
-    if response.status_code == 200:
-        tokens = response.json()
-        tokens["iat"] = int(time.time())
-        return tokens
-    else:
-        st.error("Failed to exchange code for tokens.")
-        st.write(response.text)
-        return None
+#     response = requests.post(TOKEN_URI, headers=headers, data=data)
+#     if response.status_code == 200:
+#         tokens = response.json()
+#         tokens["iat"] = int(time.time())
+#         return tokens
+#     else:
+#         st.error("Failed to exchange code for tokens.")
+#         st.write(response.text)
+#         return None
 
-# ----- Token Initialization --------------------------------------------------
-# Add a checkbox to allow forced reauthorization if needed.
-force_auth = st.checkbox("Force reauthorization (to obtain a fresh token)", value=False)
-if force_auth and os.path.exists(TOKENS_FILE):
-    os.remove(TOKENS_FILE)
-    st.info("Existing token file removed. A new token will be generated.")
+# # ----- Token Initialization --------------------------------------------------
+# # Add a checkbox to allow forced reauthorization if needed.
+# force_auth = st.checkbox("Force reauthorization (to obtain a fresh token)", value=False)
+# if force_auth and os.path.exists(TOKENS_FILE):
+#     os.remove(TOKENS_FILE)
+#     st.info("Existing token file removed. A new token will be generated.")
 
-if not os.path.exists(TOKENS_FILE):
-    st.write("No tokens.json file found. Please authorize the application.")
-    st.write("Visit the following URL to authorize and obtain a new authorization code:")
-    st.write(get_fitbit_auth_url())
-    new_code = st.text_input("Enter the new authorization code:")
-    if new_code:
-        tokens = exchange_code_for_tokens(new_code)
-        if tokens:
-            with open(TOKENS_FILE, "w", encoding="utf-8") as f:
-                json.dump(tokens, f, indent=4)
-            st.success("New tokens saved successfully!")
-        else:
-            st.error("Failed to exchange new authorization code for tokens.")
-            st.stop()  # Stop execution if tokens are not obtained.
-else:
-    with open(TOKENS_FILE, "r", encoding="utf-8") as f:
-        tokens = json.load(f)
+# if not os.path.exists(TOKENS_FILE):
+#     st.write("No tokens.json file found. Please authorize the application.")
+#     st.write("Visit the following URL to authorize and obtain a new authorization code:")
+#     #st.write(get_fitbit_auth_url())
+#     new_code = st.text_input("Enter the new authorization code:")
+#     if new_code:
+#         tokens = exchange_code_for_tokens(new_code)
+#         if tokens:
+#             with open(TOKENS_FILE, "w", encoding="utf-8") as f:
+#                 json.dump(tokens, f, indent=4)
+#             st.success("New tokens saved successfully!")
+#         else:
+#             st.error("Failed to exchange new authorization code for tokens.")
+#             st.stop()  # Stop execution if tokens are not obtained.
+# else:
+#     with open(TOKENS_FILE, "r", encoding="utf-8") as f:
+#         tokens = json.load(f)
 
 # ----- Token Manager ---------------------------------------------------------
 class TokenManager:
@@ -152,96 +153,96 @@ def refresh_fitbit_tokens(refresh_token):
         st.write(response.text)
         return None
 
-def get_valid_tokens():
-    """
-    Retrieve tokens from storage and refresh if they are expired.
-    Returns valid tokens or stops the app if no valid token is available.
-    """
-    token_manager = TokenManager()
-    tokens = token_manager.read_tokens()
-    if not tokens:
-        st.error("No tokens available. Please authenticate.")
-        st.stop()
-    if is_token_expired():
-        st.info("Access token expired. Attempting to refresh...")
-        refresh_token_val = tokens.get("refresh_token")
-        new_tokens = refresh_fitbit_tokens(refresh_token_val)
-        if new_tokens:
-            tokens = new_tokens
-        else:
-            st.error("Token refresh failed. Please reauthenticate.")
-            st.stop()
-    return tokens
+# def get_valid_tokens():
+#     """
+#     Retrieve tokens from storage and refresh if they are expired.
+#     Returns valid tokens or stops the app if no valid token is available.
+#     """
+#     token_manager = TokenManager()
+#     tokens = token_manager.read_tokens()
+#     if not tokens:
+#         st.error("No tokens available. Please authenticate.")
+#         st.stop()
+#     if is_token_expired():
+#         st.info("Access token expired. Attempting to refresh...")
+#         refresh_token_val = tokens.get("refresh_token")
+#         new_tokens = refresh_fitbit_tokens(refresh_token_val)
+#         if new_tokens:
+#             tokens = new_tokens
+#         else:
+#             st.error("Token refresh failed. Please reauthenticate.")
+#             st.stop()
+#     return tokens
 
 # ----- Fitbit API URL Helpers -----------------------------------------------
-def get_fitbit_api_url_for_day(date_str, detail_level="1min"):
-    """
-    Return the intraday API URL for a given day.
-    Date should be a string in YYYY-MM-DD format.
-    """
-    tokens = get_valid_tokens()
-    USER_ID = tokens.get("user_id")
-    return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{date_str}/1d/{detail_level}.json"
+# def get_fitbit_api_url_for_day(date_str, detail_level="1min"):
+#     """
+#     Return the intraday API URL for a given day.
+#     Date should be a string in YYYY-MM-DD format.
+#     """
+#     tokens = get_valid_tokens()
+#     USER_ID = tokens.get("user_id")
+#     return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{date_str}/1d/{detail_level}.json"
 
-def get_fitbit_api_url_for_range(start_date, end_date):
-    """
-    Return the API URL for a date range.
-    Dates should be strings in YYYY-MM-DD format.
-    (Note: The date-range endpoint returns summary data per day.)
-    """
-    tokens = get_valid_tokens()
-    USER_ID = tokens.get("user_id")
-    return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{start_date}/{end_date}.json"
+# def get_fitbit_api_url_for_range(start_date, end_date):
+#     """
+#     Return the API URL for a date range.
+#     Dates should be strings in YYYY-MM-DD format.
+#     (Note: The date-range endpoint returns summary data per day.)
+#     """
+#     tokens = get_valid_tokens()
+#     USER_ID = tokens.get("user_id")
+#     return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{start_date}/{end_date}.json"
 
 # ----- Data Fetch and Load Functions ----------------------------------------
-def update_heart_rate_data_for_day(date_str, label, detail_level="1min"):
-    """
-    Download heart rate data (in JSON format) for the specified date using the intraday endpoint.
-    Saves the file in static/data as '<date>_<label>.json' and returns the JSON data.
-    Automatically refreshes the token if needed.
-    """
-    api_url = get_fitbit_api_url_for_day(date_str, detail_level)
-    tokens = get_valid_tokens()
-    access_token = tokens.get("access_token")
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == 200:
-        json_data = response.json()
-    elif response.status_code == 401:
-        # Token might be expired; try refreshing and retrying
-        tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
-        if tokens:
-            access_token = tokens.get("access_token")
-            headers = {"Authorization": f"Bearer {access_token}"}
-            response = requests.get(api_url, headers=headers)
-            if response.status_code == 200:
-                json_data = response.json()
-            else:
-                st.error(f"Error after token refresh: {response.status_code}")
-                st.write(response.text)
-                return None
-        else:
-            st.error("Token refresh failed. Please reauthenticate.")
-            return None
-    else:
-        st.error(f"Error fetching heart rate data: {response.status_code}")
-        st.write(response.text)
-        return None
+# def update_heart_rate_data_for_day(date_str, label, detail_level="1min"):
+#     """
+#     Download heart rate data (in JSON format) for the specified date using the intraday endpoint.
+#     Saves the file in static/data as '<date>_<label>.json' and returns the JSON data.
+#     Automatically refreshes the token if needed.
+#     """
+#     api_url = get_fitbit_api_url_for_day(date_str, detail_level)
+#     tokens = get_valid_tokens()
+#     access_token = tokens.get("access_token")
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     response = requests.get(api_url, headers=headers)
+#     if response.status_code == 200:
+#         json_data = response.json()
+#     elif response.status_code == 401:
+#         # Token might be expired; try refreshing and retrying
+#         tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+#         if tokens:
+#             access_token = tokens.get("access_token")
+#             headers = {"Authorization": f"Bearer {access_token}"}
+#             response = requests.get(api_url, headers=headers)
+#             if response.status_code == 200:
+#                 json_data = response.json()
+#             else:
+#                 st.error(f"Error after token refresh: {response.status_code}")
+#                 st.write(response.text)
+#                 return None
+#         else:
+#             st.error("Token refresh failed. Please reauthenticate.")
+#             return None
+#     else:
+#         st.error(f"Error fetching heart rate data: {response.status_code}")
+#         st.write(response.text)
+#         return None
 
-    data_dir = os.path.join("static", "data")
-    os.makedirs(data_dir, exist_ok=True)
-    file_name = f"{date_str}_{label}.json"
-    file_path = os.path.join(data_dir, file_name)
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(json_data, f, indent=2)
-    return json_data
+#     data_dir = os.path.join("static", "data")
+#     os.makedirs(data_dir, exist_ok=True)
+#     file_name = f"{date_str}_{label}.json"
+#     file_path = os.path.join(data_dir, file_name)
+#     with open(file_path, "w", encoding="utf-8") as f:
+#         json.dump(json_data, f, indent=2)
+#     return json_data
 
 def load_heart_rate_data_for_day(date_str, label):
     """
     Load the heart rate JSON file for the given date (and label) from static/data,
     and return the 'dataset' (intraday measurements).
     """
-    file_path = os.path.join("static", "data", f"{date_str}_{label}.json")
+    file_path = os.path.join("static", "data", "2025-05-02_24h.json")
     if not os.path.exists(file_path):
         st.warning(f"No heart rate data file found for {date_str} ({label}). Please refresh.")
         return None
@@ -249,47 +250,47 @@ def load_heart_rate_data_for_day(date_str, label):
         json_data = json.load(f)
     return json_data.get("activities-heart-intraday", {}).get("dataset", [])
 
-def update_heart_rate_data_for_range(start_date, end_date):
-    """
-    Download heart rate data for the specified date range using the range endpoint.
-    Saves the file in static/data as '<start_date>_to_{end_date}_week.json'
-    and returns the JSON data.
-    Automatically refreshes the token if needed.
-    """
-    api_url = get_fitbit_api_url_for_range(start_date, end_date)
-    tokens = get_valid_tokens()
-    access_token = tokens.get("access_token")
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == 200:
-        json_data = response.json()
-    elif response.status_code == 401:
-        tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
-        if tokens:
-            access_token = tokens.get("access_token")
-            headers = {"Authorization": f"Bearer {access_token}"}
-            response = requests.get(api_url, headers=headers)
-            if response.status_code == 200:
-                json_data = response.json()
-            else:
-                st.error(f"Error after token refresh: {response.status_code}")
-                st.write(response.text)
-                return None
-        else:
-            st.error("Token refresh failed. Please reauthenticate.")
-            return None
-    else:
-        st.error(f"Error fetching heart rate data: {response.status_code}")
-        st.write(response.text)
-        return None
+# def update_heart_rate_data_for_range(start_date, end_date):
+#     """
+#     Download heart rate data for the specified date range using the range endpoint.
+#     Saves the file in static/data as '<start_date>_to_{end_date}_week.json'
+#     and returns the JSON data.
+#     Automatically refreshes the token if needed.
+#     """
+#     api_url = get_fitbit_api_url_for_range(start_date, end_date)
+#     tokens = get_valid_tokens()
+#     access_token = tokens.get("access_token")
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     response = requests.get(api_url, headers=headers)
+#     if response.status_code == 200:
+#         json_data = response.json()
+#     elif response.status_code == 401:
+#         tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+#         if tokens:
+#             access_token = tokens.get("access_token")
+#             headers = {"Authorization": f"Bearer {access_token}"}
+#             response = requests.get(api_url, headers=headers)
+#             if response.status_code == 200:
+#                 json_data = response.json()
+#             else:
+#                 st.error(f"Error after token refresh: {response.status_code}")
+#                 st.write(response.text)
+#                 return None
+#         else:
+#             st.error("Token refresh failed. Please reauthenticate.")
+#             return None
+#     else:
+#         st.error(f"Error fetching heart rate data: {response.status_code}")
+#         st.write(response.text)
+#         return None
 
-    data_dir = os.path.join("static", "data")
-    os.makedirs(data_dir, exist_ok=True)
-    file_name = f"{start_date}_to_{end_date}_week.json"
-    file_path = os.path.join(data_dir, file_name)
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(json_data, f, indent=2)
-    return json_data
+#     data_dir = os.path.join("static", "data")
+#     os.makedirs(data_dir, exist_ok=True)
+#     file_name = f"{start_date}_to_{end_date}_week.json"
+#     file_path = os.path.join(data_dir, file_name)
+#     with open(file_path, "w", encoding="utf-8") as f:
+#         json.dump(json_data, f, indent=2)
+#     return json_data
 
 def load_heart_rate_data_for_range(start_date, end_date):
     """
@@ -373,46 +374,71 @@ def calculate_rmssd_for_5min_intervals(data):
 
     return time_labels, rmssd_results
 
-def fetch_sleep_data():
-    """
-    Fetch sleep data from Fitbit API for today's date and save it as a JSON file.
-    Uses get_valid_tokens() to retrieve stored Fitbit tokens.
-    """
-    current_date = datetime.today().strftime("%Y-%m-%d")
-    tokens = get_valid_tokens()
+# def fetch_sleep_data():
+#     """
+#     Fetch sleep data from Fitbit API for today's date and save it as a JSON file.
+#     Uses get_valid_tokens() to retrieve stored Fitbit tokens.
+#     """
+#     current_date = datetime.today().strftime("%Y-%m-%d")
+#     tokens = get_valid_tokens()
 
-    USER_ID = tokens.get("user_id")
-    access_token = tokens.get("access_token")
-    if not USER_ID or not access_token:
-        st.error("Missing user ID or access token in stored tokens.")
-        return None
+#     USER_ID = tokens.get("user_id")
+#     access_token = tokens.get("access_token")
+#     if not USER_ID or not access_token:
+#         st.error("Missing user ID or access token in stored tokens.")
+#         return None
 
-    FITBIT_SLEEP_API = f"https://api.fitbit.com/1.2/user/{USER_ID}/sleep/date/{current_date}.json"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(FITBIT_SLEEP_API, headers=headers)
+#     FITBIT_SLEEP_API = f"https://api.fitbit.com/1.2/user/{USER_ID}/sleep/date/{current_date}.json"
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     response = requests.get(FITBIT_SLEEP_API, headers=headers)
 
-    if response.status_code == 200:
-        sleep_data = response.json()
-        os.makedirs(os.path.join("static", "data", "sleep"), exist_ok=True)
-        file_path = os.path.join("static", "data", "sleep", f"{current_date}_sleep.json")
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(sleep_data, f, indent=4)
-        return sleep_data
-    else:
-        st.error(f"Failed to fetch sleep data: {response.status_code} - {response.text}")
-        return None
+#     if response.status_code == 200:
+#         sleep_data = response.json()
+#         os.makedirs(os.path.join("static", "data", "sleep"), exist_ok=True)
+#         file_path = os.path.join("static", "data", "sleep", f"{current_date}_sleep.json")
+#         with open(file_path, "w", encoding="utf-8") as f:
+#             json.dump(sleep_data, f, indent=4)
+#         return sleep_data
+#     else:
+#         st.error(f"Failed to fetch sleep data: {response.status_code} - {response.text}")
+#         return None
 #### =============================== Sleep stages process functions =============================
 def load_sleep_data(date_str=None):
-    """
-    Load sleep data from static/data/sleep.
-    """
+
+    base_dir = os.path.join("static", "data", "sleep")
+    
     if date_str is None:
         date_str = datetime.today().strftime("%Y-%m-%d")
-    file_path = os.path.join("static", "data", "sleep", f"{date_str}_sleep.json")
-    if os.path.exists(file_path):
+    
+    target_file = f"{date_str}_sleep.json"
+    file_path = os.path.join(base_dir, target_file)
+
+    if not os.path.exists(file_path):
+        # Fallback: find the latest available sleep file
+        def extract_date(filename):
+            try:
+                return datetime.strptime(filename.split("_")[0], "%Y-%m-%d")
+            except ValueError:
+                return None
+
+        sleep_files = [
+            f for f in os.listdir(base_dir)
+            if f.endswith("_sleep.json") and extract_date(f) is not None
+        ]
+
+        if not sleep_files:
+            return None
+
+        # Get the latest file by date
+        latest_file = sorted(sleep_files, key=extract_date, reverse=True)[0]
+        file_path = os.path.join(base_dir, latest_file)
+
+    try:
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)
-    return None
+    except Exception as e:
+        print(f"Error loading file: {file_path}. Reason: {e}")
+        return None
 def process_sleep_data(sleep_data):
     """
     Process Fitbit sleep data into a structured DataFrame.
@@ -656,40 +682,40 @@ def plot_rmssd_trends(date_str, label):
 
     #================== Get SpO2 data ============================
 
-def fetch_spo2_data():
-    """
-    Fetch SPO2 data from the Fitbit API for today's date and save it as a JSON file.
-    Uses get_valid_tokens() to retrieve stored Fitbit tokens.
+# def fetch_spo2_data():
+#     """
+#     Fetch SPO2 data from the Fitbit API for today's date and save it as a JSON file.
+#     Uses get_valid_tokens() to retrieve stored Fitbit tokens.
     
-    The JSON file is saved in the folder static/data/spo2 as {current_date}_spo2.json.
+#     The JSON file is saved in the folder static/data/spo2 as {current_date}_spo2.json.
     
-    Returns:
-      dict: The SPO2 data retrieved from the Fitbit API, or None if an error occurs.
-    """
-    #current_date = datetime.today().strftime("%Y-%m-%d")
-    yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-    tokens = get_valid_tokens()
-    #current_date ="2025-03-09"
+#     Returns:
+#       dict: The SPO2 data retrieved from the Fitbit API, or None if an error occurs.
+#     """
+#     #current_date = datetime.today().strftime("%Y-%m-%d")
+#     yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+#     tokens = get_valid_tokens()
+#     #current_date ="2025-03-09"
 
-    access_token = tokens.get("access_token")
-    if not access_token:
-        st.error("Missing access token in stored tokens.")
-        return None
+#     access_token = tokens.get("access_token")
+#     if not access_token:
+#         st.error("Missing access token in stored tokens.")
+#         return None
 
-    # Construct the correct Fitbit SPO2 API endpoint URL
-    FITBIT_SPO2_API = f"https://api.fitbit.com/1/user/-/spo2/date/{yesterday}/all.json"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(FITBIT_SPO2_API, headers=headers)
+#     # Construct the correct Fitbit SPO2 API endpoint URL
+#     FITBIT_SPO2_API = f"https://api.fitbit.com/1/user/-/spo2/date/{yesterday}/all.json"
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     response = requests.get(FITBIT_SPO2_API, headers=headers)
 
-    if response.status_code == 200:
-        spo2_data = response.json()
-        # Create the target folder if it doesn't exist
-        folder = os.path.join("static", "data", "spo2")
-        os.makedirs(folder, exist_ok=True)
-        file_path = os.path.join(folder, f"{yesterday}_spo2.json")
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(spo2_data, f, indent=4)
-        return spo2_data
-    else:
-        st.error(f"Failed to fetch SPO2 data: {response.status_code} - {response.text}")
-        return None
+#     if response.status_code == 200:
+#         spo2_data = response.json()
+#         # Create the target folder if it doesn't exist
+#         folder = os.path.join("static", "data", "spo2")
+#         os.makedirs(folder, exist_ok=True)
+#         file_path = os.path.join(folder, f"{yesterday}_spo2.json")
+#         with open(file_path, "w", encoding="utf-8") as f:
+#             json.dump(spo2_data, f, indent=4)
+#         return spo2_data
+#     else:
+#         st.error(f"Failed to fetch SPO2 data: {response.status_code} - {response.text}")
+#         return None

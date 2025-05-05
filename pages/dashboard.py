@@ -1,7 +1,13 @@
 # pages/dashboard.py
 from dotenv import load_dotenv
 import streamlit as st
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="EDT System",
+    page_icon="📈",           # or your own "assets/favicon.png"
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+#st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 import streamlit.components.v1 as components
 from datetime import datetime, timedelta
 import os
@@ -32,7 +38,7 @@ from sleep.sleeppatterns import(
 
 )
 from config import (
-    update_heart_rate_data_for_day,
+    #update_heart_rate_data_for_day,
     plot_heart_rate_for_day,
     process_heart_rate_data,
     load_heart_rate_data_for_day,
@@ -41,10 +47,10 @@ from config import (
     plot_rmssd_trends,
     plot_sleep_stages,
     process_sleep_data,
-    fetch_sleep_data,
+    #fetch_sleep_data,
     load_sleep_data,
     plot_sleep_trends,
-    fetch_spo2_data,
+    #fetch_spo2_data,
 )
 openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # --- Define a LangChain-based recommendation function ---
@@ -73,24 +79,82 @@ if "authenticated" not in st.session_state or not st.session_state["authenticate
 with st.sidebar:
     st.markdown("### 📌 Navigation")
     st.markdown("---")
-    if "menu_option" not in st.session_state:
-        st.session_state["menu_option"] = "trends"  # Default page
 
-    if st.button("📈 Trends", key="trends"):
-        st.session_state["menu_option"] = "trends"
-    if st.button("❤️ Heart Model", key="heart_model"):
-        st.session_state["menu_option"] = "heart_model"
-    if st.button("🫁 Respiratory Model", key="respiratory_model"):
-        st.session_state["menu_option"] = "respiratory_model"
+    menu_items = [
+        ("📈 Trends", "trends"),
+        ("❤️ Heart Model", "heart_model"),
+        ("🫁 Respiratory Model", "respiratory_model"),
+    ]
+    for label, key in menu_items:
+        if st.button(label, key=key, use_container_width=True):
+            st.session_state["menu_option"] = key
+        # spacer
+        st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
+
     st.markdown("---")
-    if st.button("🚪 Logout", key="logout"):
-        st.session_state["authenticated"] = False
-        st.session_state["username"] = ""
-        st.switch_page("main.py")  # Redirect to login
+
+# ------------------------
+# Profile Settings Expander
+# ------------------------
+    st.markdown(
+        """
+        <style>
+            .initial-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+        .profile-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # --- Profile row: circle + name ---
+    first = st.session_state.get("first_name", "")
+    last  = st.session_state.get("last_name", "")
+    initial = first[:1].upper() if first else "?"
+    full_name = " ".join(filter(None, [first, last])).strip() or "—"
+
+    # ② Render a flex‐row entirely in markdown
+    st.markdown(
+        f"""
+        <div class="profile-row">
+          <div class="initial-circle">{initial}</div>
+          <div style="font-weight:bold; font-size:16px;">{full_name}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # small spacer
+    st.markdown("")
+
+    # logout
+    if st.button("🚪 Logout", use_container_width=True):
+        for k in ("authenticated","username","first_name","last_name"):
+            st.session_state.pop(k, None)
+        st.switch_page("main.py")
+        
+if "menu_option" not in st.session_state:
+    st.session_state["menu_option"] = "trends"
 
 # Render the Selected Page Content
 if st.session_state["menu_option"] == "trends":
-    st.markdown("<h2 style='font-weight:bold;'>📈 Dashboard</h2>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-weight:bold;'>Real time Monitoring</h3>", unsafe_allow_html=True)
      # Create Container for Tabs
     st.markdown("""
     <style>
@@ -122,7 +186,8 @@ if st.session_state["menu_option"] == "trends":
                     # Process sleep data and display sleep stages chart with total duration badges
                     sleep_data = load_sleep_data()
                     if not sleep_data:
-                        sleep_data = fetch_sleep_data()
+                       # sleep_data = fetch_sleep_data()
+                       sleep_data = load_sleep_data()
                     if sleep_data:
                         df_sleep = process_sleep_data(sleep_data)
                         plot_sleep_stages(df_sleep)
@@ -271,7 +336,8 @@ if st.session_state["menu_option"] == "trends":
                         description = "Sleep Metrics",
                         color_name=  "yellow-80",
                     )
-                    efficiency = calculate_sleep_efficiency_current_day()  # your existing function
+                    sleep_data = load_sleep_data()
+                    efficiency = calculate_sleep_efficiency_current_day(sleep_data)  # your existing function
                     if efficiency is not None:
                         analyze_sleep_quality(efficiency)
                     with st.container():
@@ -290,11 +356,11 @@ if st.session_state["menu_option"] == "trends":
                                     """,
                                     unsafe_allow_html=True
                                 )
-                            latency = calculate_sleep_latency_current_day()
+                            latency = calculate_sleep_latency_current_day(sleep_data)
                             if latency is not None:
                                 st.metric("Sleep Latency", f"{latency:.0f} seconds ({latency/60:.1f} minutes)")
                         with row_subcol2:
-                            num_awakenings = count_awakenings_current_day()
+                            num_awakenings = count_awakenings_current_day(sleep_data)
                             if num_awakenings is not None:
                                 st.metric("Number of Awakenings", f"{num_awakenings} times")
                 with row3_col2: 
@@ -311,8 +377,9 @@ if st.session_state["menu_option"] == "trends":
             with st.container():
                 sp_row1, sp_row2 = st.columns(2)
                 with sp_row1:
-                    fetch_spo2_data()
-                    SPO2Analyzer.plot_spo2_last_night()
+                    #fetch_spo2_data()
+                    spo2_data = SPO2Analyzer.load_spo2_data()
+                    SPO2Analyzer.plot_spo2_last_night(spo2_data)
                     SPO2Analyzer.plot_spo2_liquid_fill()
                 with sp_row2:
                     SPO2Analyzer.plot_hr_spo2_last_night()
@@ -337,7 +404,7 @@ elif st.session_state["menu_option"] == "heart_model":
             # For 24-hour trends, we use today's date.
             date_today = datetime.now().strftime("%Y-%m-%d")
             # Download and save today's intraday data (using label "24h").
-            _ = update_heart_rate_data_for_day(date_today, "24h")
+           # _ = update_heart_rate_data_for_day(date_today, "24h")
             # Plot the 24-hour heart rate data.
             plot_heart_rate_for_day(date_today, "24h")
             #--------- 24 hours Heart Rate Summary --------------------------------
@@ -379,7 +446,7 @@ elif st.session_state["menu_option"] == "heart_model":
         with tabs[1]:
             st.header("Yesterday Trends")
             date_yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            _ = update_heart_rate_data_for_day(date_yesterday, "yesterday")
+            #_ = update_heart_rate_data_for_day(date_yesterday, "yesterday")
             plot_heart_rate_for_day(date_yesterday, "yesterday")
             yes_dataset= load_heart_rate_data_for_day(date_yesterday, "yesterday")
             df_yesterday_heart_rate = process_heart_rate_data(yes_dataset)
