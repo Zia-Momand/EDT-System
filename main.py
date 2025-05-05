@@ -77,8 +77,8 @@ def login():
     password = st.text_input("Password", type="password")
 
     # Buttons
-    login_clicked = st.button("Login", icon="🔑", type="primary", use_container_width=True)
-    register_clicked = st.button("Sign Up", icon="➕", type="primary", use_container_width=True)
+    login_clicked = st.button(" 🔑 Login", type="primary", use_container_width=True)
+    register_clicked = st.button("➕ Sign Up", type="primary", use_container_width=True)
 
     if login_clicked:
         # Have login_user return either None (bad) or a user-dict on success
@@ -125,21 +125,36 @@ def register():
         """,
         unsafe_allow_html=True
     )
+
     st.markdown("## Register")
+
+    # Core caregiver registration fields
     first_name = st.text_input("First Name")
     last_name = st.text_input("Last Name")
+    email = st.text_input("Email Address")
+    caregiver_type = st.selectbox("Type of Caregiver", ["Family", "Volunteer", "Professional"])
+    
+    # Auth fields
     username = st.text_input("New Username")
     password = st.text_input("New Password", type="password")
+    confirm_password = st.text_input("Confirm Password", type="password")
 
-    if st.button("Register", icon="➕", type="primary", use_container_width=True):
-        if register_user(first_name, last_name, username, password):
-            st.success("User registered successfully! Now you can login.")
-            st.session_state["show_register"] = False
+    if st.button("➕ Register", type="primary", use_container_width=True):
+        if password != confirm_password:
+            st.warning("Passwords do not match.")
+        elif not all([first_name, last_name, email, username, password]):
+            st.warning("Please fill in all required fields.")
         else:
-            st.error("Username already exists!")
+            success = register_user(first_name, last_name, username, password, email, caregiver_type)
+            if success:
+                st.success("User registered successfully! Now you can login.")
+                st.session_state["show_register"] = False
+            else:
+                st.error("Username already exists or registration failed.")
 
-    if st.button("Login", icon="🔑", type="primary", use_container_width=True):
+    if st.button("🔑 Login", type="primary", use_container_width=True):
         st.session_state["show_register"] = False
+
 
 # ------------------------
 # ✅ Main UI Logic (Routing)
