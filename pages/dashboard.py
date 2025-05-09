@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 import streamlit as st
 st.set_page_config(
     page_title="EDT System",
-    page_icon="📈",           # or your own "assets/favicon.png"
+    page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 #st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 import streamlit.components.v1 as components
@@ -19,6 +19,7 @@ import streamlit_antd_components as sac
 from streamlit_extras.colored_header import colored_header
 from spo2.spo2patterns import SPO2Analyzer
 from streamlit_echarts import st_echarts
+from logger_manager import LoggerManager
 
 # # Load environment variables from the .env file
 load_dotenv()
