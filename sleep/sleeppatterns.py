@@ -17,6 +17,7 @@ from streamlit_echarts import st_echarts
 import plotly.graph_objects as go
 
 class SleepPattern:
+    
     @staticmethod
     def plot_sleep_benchmark(df_sleep, toast_callback=None):
         """

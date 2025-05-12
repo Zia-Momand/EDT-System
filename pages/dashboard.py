@@ -151,12 +151,11 @@ with st.sidebar:
         st.switch_page("main.py")
         
 if "menu_option" not in st.session_state:
-    st.session_state["menu_option"] = "trends"
+    st.session_state["menu_option"] = "Trends"
 
 # Render the Selected Page Content
-if st.session_state["menu_option"] == "trends":
+if st.session_state["menu_option"] == "Trends":
     st.markdown("<h3 style='font-weight:bold;'>Real time Monitoring</h3>", unsafe_allow_html=True)
-     # Create Container for Tabs
     st.markdown("""
     <style>
     /* This selector targets Streamlit's horizontal block columns.
@@ -175,126 +174,141 @@ if st.session_state["menu_option"] == "trends":
     """, unsafe_allow_html=True)
     
     with st.container():
-        tab1, tab2 = st.tabs(["🛏️ Sleep Quality Analysis", "🩸 Blood Oxygen Situration Analysis"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🛏️ Sleep Stages Analysis",
+        "📊 Sleep Benchmarks",
+        "📈 Sleep Trend Analysis",
+        "🔄 Sleep Metrics and Stage Transitions",
+        "🩸 Blood Oxygen Saturation Analysis"
+        ])
 
         # Sleep Quality Tab
         with tab1:
-            # ----- FIRST ROW: Sleep Stages & Sleep Benchmark -----
-            with st.container():
-                row1_col1, row1_col2 = st.columns(2)
-                
-                with row1_col1:
-                    # Process sleep data and display sleep stages chart with total duration badges
+            # Start a div wrapper with fixed width and auto-centered layout
+            st.markdown("""
+                <div style='max-width: 500px; margin: 0 auto; padding: 20px;'>
+            """, unsafe_allow_html=True)
+
+            # Create a single column layout to ensure vertical stacking
+            col = st.columns(1)[0]  # one column, indexed
+
+            with col:
+                # ---- ROW 1: Sleep Stage Chart ----
+                with st.container():
                     sleep_data = load_sleep_data()
                     if not sleep_data:
-                       # sleep_data = fetch_sleep_data()
-                       sleep_data = load_sleep_data()
+                        sleep_data = load_sleep_data()
+
                     if sleep_data:
                         df_sleep = process_sleep_data(sleep_data)
-                        plot_sleep_stages(df_sleep)
-                        
-                        # Calculate total duration (in seconds) per sleep stage
-                        total_durations = df_sleep.groupby("level")["seconds"].sum().reset_index()
-                        
-                        def format_duration(sec):
-                            hrs = sec // 3600
-                            mins = (sec % 3600) // 60
-                            secs = sec % 60
-                            return f"{hrs:02d}:{mins:02d}:{secs:02d}"
-                        
-                        st.markdown("###### Total Duration by Sleep Stage")
-                        
-                        # Define colors and icons for each sleep stage
-                        sleep_colors = {
-                            "wake": "#c19a6b",
-                            "rem": "#b19cd9",
-                            "light": "#654ea3",
-                            "deep": "#000033",
-                        }
-                        stage_icons = {
-                            "wake": "☀️",
-                            "rem": "💤",
-                            "light": "🌙",
-                            "deep": "😴"
-                        }
-                        
-                        # Create a row of badges styled as inline HTML
-                        badge_html = "<div style='display: flex; gap: 10px; flex-wrap: wrap;'>"
-                        for idx, row in total_durations.iterrows():
-                            stage = row["level"]
-                            duration = format_duration(row["seconds"])
-                            color = sleep_colors.get(stage, "#ccc")
-                            icon = stage_icons.get(stage, "")
-                            badge_html += (
-                                f"<span style='background-color: {color}; color: white; border-radius: 10px; "
-                                "padding: 10px; font-size: 14px;'>"
-                                f"{icon} {stage.capitalize()}: {duration}</span>"
-                            )
-                        badge_html += "</div>"
-                        st.markdown(badge_html, unsafe_allow_html=True)
-                
-                with row1_col2:
-                    if "ai_recommendation" not in st.session_state:
-                        st.session_state["ai_recommendation"] = ""
-                    if "ai_recommendation_generated" not in st.session_state:
-                        st.session_state["ai_recommendation_generated"] = False
+                        plot_sleep_stages(df_sleep)  # This is your chart
 
-                    def display_ai_recommendation(details: str, recommendation: str):
-                        """ Function to process AI recommendation and update session state with streaming text """
-                        final_message = (
-                            f"**Abnormal Sleep Stage Details:**\n\n{details}\n\n"
-                            f"**Your Personalized Sleep Recommendation:**\n\n"
+                # ---- ROW 2: Sleep Stage Duration Summary ----
+                with st.container():
+                    total_durations = df_sleep.groupby("level")["seconds"].sum().reset_index()
+
+                    def format_duration(sec):
+                        hrs = sec // 3600
+                        mins = (sec % 3600) // 60
+                        secs = sec % 60
+                        return f"{hrs:02d}:{mins:02d}:{secs:02d}"
+
+                    st.markdown("###### Total Duration by Sleep Stage")
+
+                    sleep_colors = {
+                        "wake": "#c19a6b",
+                        "rem": "#b19cd9",
+                        "light": "#654ea3",
+                        "deep": "#000033",
+                    }
+                    stage_icons = {
+                        "wake": "☀️",
+                        "rem": "💤",
+                        "light": "🌙",
+                        "deep": "😴"
+                    }
+
+                    badge_html = "<div style='display: flex; gap: 10px; flex-wrap: wrap;'>"
+                    for idx, row in total_durations.iterrows():
+                        stage = row["level"]
+                        duration = format_duration(row["seconds"])
+                        color = sleep_colors.get(stage, "#ccc")
+                        icon = stage_icons.get(stage, "")
+                        badge_html += (
+                            f"<span style='background-color: {color}; color: white; border-radius: 10px; "
+                            "padding: 10px; font-size: 14px;'>"
+                            f"{icon} {stage.capitalize()}: {duration}</span>"
                         )
+                    badge_html += "</div>"
+                    st.markdown(badge_html, unsafe_allow_html=True)
 
-                        st.session_state["ai_recommendation"] = final_message
-                        st.session_state["ai_recommendation_generated"] = True
 
-                        recommendation_container = st.empty()  # Create a placeholder for streaming
 
-                        streamed_text = ""
-                        words = recommendation.split()
+        with tab2:
+            with st.container():
+                st.subheader("Sleep Benchmarks")
+                if "ai_recommendation" not in st.session_state:
+                    st.session_state["ai_recommendation"] = ""
+                if "ai_recommendation_generated" not in st.session_state:
+                    st.session_state["ai_recommendation_generated"] = False
 
-                        for i, word in enumerate(words):
-                            streamed_text += word + " "
-                            recommendation_container.markdown(
-                                f'<div id="ai_recommendation_div" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">'
-                                f'{st.session_state["ai_recommendation"]}{streamed_text} ✨'
-                                f"</div>",
-                                unsafe_allow_html=True
-                            )
-                            time.sleep(0.05)  # Adjust speed for better streaming effect
-                        
-                        # Store final streamed text in session state to persist
-                        st.session_state["ai_recommendation"] += streamed_text
+                def display_ai_recommendation(details: str, recommendation: str):
+                    """ Function to process AI recommendation and update session state with streaming text """
+                    final_message = (
+                        f"**Abnormal Sleep Stage Details:**\n\n{details}\n\n"
+                        f"**Your Personalized Sleep Recommendation:**\n\n"
+                    )
 
-                    st.markdown("##### Sleep Benchmark")
+                    st.session_state["ai_recommendation"] = final_message
+                    st.session_state["ai_recommendation_generated"] = True
 
-                    if not st.session_state["ai_recommendation_generated"]:
-                        # Display the sleep benchmark plot only if the AI recommendation is not generated
-                        st.markdown('<div id="sleep_benchmark_plot">', unsafe_allow_html=True)
-                        if not df_sleep.empty:
-                            SleepPattern.plot_sleep_benchmark(df_sleep, toast_callback=display_ai_recommendation)
-                        else:
-                            st.warning("No sleep data available for benchmark.")
-                        st.markdown("</div>", unsafe_allow_html=True)
+                    recommendation_container = st.empty()  # Create a placeholder for streaming
 
-                    # Show AI Recommendation section only if the session state is active
-                    if st.session_state["ai_recommendation_generated"]:
-                        
-                        # Display final streamed recommendation (if available)
-                        st.markdown(
+                    streamed_text = ""
+                    words = recommendation.split()
+
+                    for i, word in enumerate(words):
+                        streamed_text += word + " "
+                        recommendation_container.markdown(
                             f'<div id="ai_recommendation_div" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">'
-                            f'{st.session_state["ai_recommendation"]}'
+                            f'{st.session_state["ai_recommendation"]}{streamed_text} ✨'
                             f"</div>",
                             unsafe_allow_html=True
                         )
+                        time.sleep(0.05)  # Adjust speed for better streaming effect
+                    
+                    # Store final streamed text in session state to persist
+                    st.session_state["ai_recommendation"] += streamed_text
 
-                        # Button to clear AI recommendation and restore sleep benchmark plot
-                        if st.button("Clear Recommendation"):
-                            st.session_state["ai_recommendation"] = ""
-                            st.session_state["ai_recommendation_generated"] = False
-                            st.rerun()
-                
+                st.markdown("##### Sleep Benchmark")
+
+                if not st.session_state["ai_recommendation_generated"]:
+                    # Display the sleep benchmark plot only if the AI recommendation is not generated
+                    st.markdown('<div id="sleep_benchmark_plot">', unsafe_allow_html=True)
+                    if not df_sleep.empty:
+                        SleepPattern.plot_sleep_benchmark(df_sleep, toast_callback=display_ai_recommendation)
+                    else:
+                        st.warning("No sleep data available for benchmark.")
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+                # Show AI Recommendation section only if the session state is active
+                if st.session_state["ai_recommendation_generated"]:
+                    
+                    # Display final streamed recommendation (if available)
+                    st.markdown(
+                        f'<div id="ai_recommendation_div" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">'
+                        f'{st.session_state["ai_recommendation"]}'
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+
+                    # Button to clear AI recommendation and restore sleep benchmark plot
+                    if st.button("Clear Recommendation"):
+                        st.session_state["ai_recommendation"] = ""
+                        st.session_state["ai_recommendation_generated"] = False
+                        st.rerun()
+        # Sleep Trend Tab
+        with tab3:
             # ----- SECOND ROW: Sleep Trends & Sleep Patterns -----
             with st.container():
                 row2_col1, row2_col2 = st.columns(2)
@@ -328,7 +342,9 @@ if st.session_state["menu_option"] == "trends":
                     week_data = load_sleep_data_for_week()
                     total_avg_duration = calculate_average_sleep_duration(week_data)
                     total_avg_each_stage_duration = analyze_average_stages(week_data)
-                    visualize_avg_sleep_data(total_avg_duration, total_avg_each_stage_duration)
+                    visualize_avg_sleep_data(total_avg_duration, total_avg_each_stage_duration)        
+        # Sleep Metrics and Stage Transitions Tab
+        with tab4:
             with st.container():
                 row3_col1, row3_col2 = st.columns(2)
                 with row3_col1:
@@ -371,9 +387,8 @@ if st.session_state["menu_option"] == "trends":
                         color_name=  "yellow-80",
                     ) 
                     analyze_sleep_stage_transitions(df_sleep) 
-              
         # SPO2 Analysis Tab (Placeholder)
-        with tab2:
+        with tab5:
             st.subheader("Blood Oxygen Saturation Analysis During Sleep")
             with st.container():
                 sp_row1, sp_row2 = st.columns(2)
