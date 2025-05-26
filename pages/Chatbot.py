@@ -44,7 +44,8 @@ def chat_stream(response_text):
 # --- Main Streamlit App ---
 
 def main():
-    st.title("Ask about Elderly Loved One Health Status")
+    st.markdown("##### ElderCare Companion - Real-time Health Insights for your loved one")
+    st.markdown("---")
 
     # Initialize chat history in session_state if needed
     if "messages" not in st.session_state:
@@ -71,10 +72,14 @@ def main():
 
     # 1. Standalone question prompt
     standalone_question_template = (
-        "given a sensor reading calories data, you have read the data from vector embedding and Given some conversation history (if any) and a question, convert the question to a standalone question. \n"
-        "conversation history: {conv_history}\n"
-        "question: {question}\n"
-        "standalone question:"
+        "Given a sensor reading calories data, you have read the data from vector embedding and given some conversation history (if any) and a question, convert the question to a standalone question.\n"
+        "\n"
+        "- If the user asks for the latest heart rate, look at the data and return the most recent heart rate value for one day.\n"
+        "- If the user asks for heart rate over one week, summarize it with a single representative value and provide an interpretation.\n"
+        "\n"
+        "Conversation history: {conv_history}\n"
+        "Question: {question}\n"
+        "Standalone question:"
     )
     standalone_prompt = PromptTemplate(
         template=standalone_question_template,

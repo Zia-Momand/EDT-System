@@ -20,6 +20,7 @@ from streamlit_extras.colored_header import colored_header
 from spo2.spo2patterns import SPO2Analyzer
 from streamlit_echarts import st_echarts
 from logger_manager import LoggerManager
+from streamlit_shadcn_ui import tabs
 
 # # Load environment variables from the .env file
 load_dotenv()
@@ -82,8 +83,8 @@ with st.sidebar:
     st.markdown("---")
 
     menu_items = [
-        ("📈 Trends", "trends"),
         ("❤️ Heart Model", "heart_model"),
+        ("🛏️ Sleep Pattern Model", "Trends"),
         ("🫁 Respiratory Model", "respiratory_model"),
     ]
     for label, key in menu_items:
@@ -155,7 +156,7 @@ if "menu_option" not in st.session_state:
 
 # Render the Selected Page Content
 if st.session_state["menu_option"] == "Trends":
-    st.markdown("<h3 style='font-weight:bold;'>Real time Monitoring</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-weight:bold;'>Sleep Patterns Analysis Dashboard</h3>", unsafe_allow_html=True)
     st.markdown("""
     <style>
     /* This selector targets Streamlit's horizontal block columns.
@@ -170,41 +171,41 @@ if st.session_state["menu_option"] == "Trends":
     .st-emotion-cache-ocqkz7 {
     flex-wrap: nowrap !important;
     }
+    div[data-baseweb="radio"] > div {
+    flex-direction: row;
+    }
     </style>
     """, unsafe_allow_html=True)
-    
-    with st.container():
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    st.markdown("---")
+    tabs  = tabs(options = [
         "🛏️ Sleep Stages Analysis",
         "📊 Sleep Benchmarks",
         "📈 Sleep Trend Analysis",
         "🔄 Sleep Metrics and Stage Transitions",
         "🩸 Blood Oxygen Saturation Analysis"
-        ])
+    ],
+    default_value = "🛏️ Sleep Stages Analysis",
+    key="custom_tabs")
 
-        # Sleep Quality Tab
-        with tab1:
-            # Start a div wrapper with fixed width and auto-centered layout
-            st.markdown("""
-                <div style='max-width: 500px; margin: 0 auto; padding: 20px;'>
-            """, unsafe_allow_html=True)
-
-            # Create a single column layout to ensure vertical stacking
-            col = st.columns(1)[0]  # one column, indexed
-
-            with col:
-                # ---- ROW 1: Sleep Stage Chart ----
-                with st.container():
-                    sleep_data = load_sleep_data()
-                    if not sleep_data:
-                        sleep_data = load_sleep_data()
-
+    sleep_data = load_sleep_data()
+    df_sleep = process_sleep_data(sleep_data)
+    
+    # =========== Tab1: Sleep Stages Analysis ==============
+    if tabs == "🛏️ Sleep Stages Analysis":
+        # Start a div wrapper with fixed width and auto-centered layout
+        st.markdown("""
+            <div style='max-width: 500px; margin: 0 auto; padding: 20px;'>
+        """, unsafe_allow_html=True)
+        # Create a single column layout to ensure vertical stacking
+        col = st.columns(1)[0]  # one column, indexed
+        with col: 
+            # ---- ROW 2: Sleep Stage Duration Summary ----
+            with st.container():
+                col1, col2 = st.columns([2, 1])
+                with col1:
                     if sleep_data:
-                        df_sleep = process_sleep_data(sleep_data)
-                        plot_sleep_stages(df_sleep)  # This is your chart
-
-                # ---- ROW 2: Sleep Stage Duration Summary ----
-                with st.container():
+                     plot_sleep_stages(df_sleep)
+                with col2:
                     total_durations = df_sleep.groupby("level")["seconds"].sum().reset_index()
 
                     def format_duration(sec):
@@ -227,8 +228,11 @@ if st.session_state["menu_option"] == "Trends":
                         "light": "🌙",
                         "deep": "😴"
                     }
+                    
 
-                    badge_html = "<div style='display: flex; gap: 10px; flex-wrap: wrap;'>"
+                    badge_html = """
+                    <div style='display: flex; flex-direction: column; gap: 10px; width: 100%;'>
+                    """
                     for idx, row in total_durations.iterrows():
                         stage = row["level"]
                         duration = format_duration(row["seconds"])
@@ -236,16 +240,180 @@ if st.session_state["menu_option"] == "Trends":
                         icon = stage_icons.get(stage, "")
                         badge_html += (
                             f"<span style='background-color: {color}; color: white; border-radius: 10px; "
-                            "padding: 10px; font-size: 14px;'>"
+                            "padding: 10px; font-size: 18px; display: block; width: 100%; box-sizing: border-box; text-align: center;'>"
                             f"{icon} {stage.capitalize()}: {duration}</span>"
                         )
-                    badge_html += "</div>"
+                    badge_html += "</div>"""
                     st.markdown(badge_html, unsafe_allow_html=True)
 
-
-
-        with tab2:
+            # ---- ROW 3: Action Buttons ----
             with st.container():
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    if st.button("🔍 Explore Interpretation", use_container_width=True):
+                        from collections import defaultdict
+                        
+                        # --- Transition Matrix & Fragmentation ---
+                        df_sorted = df_sleep.sort_values("dateTime").reset_index(drop=True)
+                        df_sorted["next_stage"] = df_sorted["level"].shift(-1)
+                        transition_counts = pd.crosstab(df_sorted["level"], df_sorted["next_stage"])
+                        transition_prob = transition_counts.div(transition_counts.sum(axis=1), axis=0)
+
+                        # --- Fragmentation Index ---
+                        total_transitions = len(df_sorted) - 1
+                        total_duration_seconds = df_sorted["seconds"].sum()
+                        total_duration_hours = total_duration_seconds / 3600.0 if total_duration_seconds > 0 else 0
+                        transitions_per_hour = total_transitions / total_duration_hours if total_duration_hours > 0 else 0
+
+                        # Count A → B → A patterns
+                        pattern_count = 0
+                        for i in range(len(df_sorted) - 2):
+                            a, b, a_next = df_sorted.iloc[i]["level"], df_sorted.iloc[i+1]["level"], df_sorted.iloc[i+2]["level"]
+                            if a == a_next and a != b:
+                                pattern_count += 1
+
+                        # --- Stage Durations in Minutes ---
+                        duration_minutes = df_sleep.groupby("level")["seconds"].sum() // 60
+                        wake = duration_minutes.get("wake", 0)
+                        rem = duration_minutes.get("rem", 0)
+                        light = duration_minutes.get("light", 0)
+                        deep = duration_minutes.get("deep", 0)
+
+                        # --- Build Interpretation ---
+                        summary = []
+
+                        # Sleep Stage Ranges (Clinical references)
+                        # National Sleep Foundation benchmarks
+                        # Percentages based on total sleep time (not enforced strictly here)
+                        summary.append("### 🧠 Sleep Interpretation for Caregivers")
+
+                        # Deep Sleep
+                        if deep < 30:
+                            summary.append("😴 **Low Deep Sleep**: Deep sleep is less than 30 minutes. This may affect physical restoration and healing.")
+                        else:
+                            summary.append("💪 **Good Deep Sleep**: Enough deep sleep for body recovery.")
+
+                        # REM
+                        if rem < 20:
+                            summary.append("💤 **Low REM Sleep**: REM sleep is under 20 minutes. This may reduce emotional and cognitive recovery.")
+                        else:
+                            summary.append("🧠 **Healthy REM Sleep**: Adequate REM helps with memory and emotional health.")
+
+                        # Wake
+                        if wake > 60:
+                            summary.append("⏰ **Frequent Awakenings**: Wake time is more than 1 hour. This may indicate fragmented or poor-quality sleep.")
+                        else:
+                            summary.append("✔️ **Stable Sleep Continuity**: Wake time is within normal limits.")
+
+                        # Transitions
+                        if transitions_per_hour > 10:
+                            summary.append(f"🔄 **High Fragmentation**: {transitions_per_hour:.1f} stage transitions per hour. Sleep was restless with frequent changes.")
+                        else:
+                            summary.append(f"🔁 **Low Fragmentation**: Only {transitions_per_hour:.1f} transitions per hour — sleep is stable.")
+
+                        # A→B→A patterns
+                        if pattern_count > 5:
+                            summary.append(f"📉 **Frequent Sleep Interruptions**: {pattern_count} unstable stage sequences detected. Consider improving sleep conditions.")
+                        else:
+                            summary.append(f"📈 **Sleep Stage Stability**: Only {pattern_count} unstable sequences — sleep is well-structured.")
+
+                        # Optional: highlight transition anomalies
+                        if not transition_prob.empty:
+                            most_common_from = transition_prob.idxmax(axis=1).to_dict()
+                            if most_common_from.get("light") != "rem":
+                                summary.append("⚠️ **Unusual Stage Transition**: Light sleep is not primarily transitioning into REM. May suggest disruption.")
+
+                        st.info("\n\n".join(summary))
+
+
+
+                with col2:
+
+                    def get_sleep_recommendation_langchain(df_sleep):
+                        # Aggregate total time in each stage in minutes
+                        duration_summary = df_sleep.groupby("level")["seconds"].sum() // 60
+                        wake = int(duration_summary.get("wake", 0))
+                        rem = int(duration_summary.get("rem", 0))
+                        light = int(duration_summary.get("light", 0))
+                        deep = int(duration_summary.get("deep", 0))
+                        total_sleep = wake + rem + light + deep
+
+                        prompt_template = """A caregiver is reviewing a patient's sleep report, which is structured as follows:
+
+                            - Total Sleep Time: {total_sleep} minutes
+                            - Wake Time: {wake} minutes
+                            - REM Sleep: {rem} minutes
+                            - Light Sleep: {light} minutes
+                            - Deep Sleep: {deep} minutes
+
+                            Based on clinical guidelines, evaluate whether these sleep stages are within a healthy range.
+                            Then, provide **clear, actionable recommendations** for improving sleep quality **without using medical jargon**.
+                            Ensure the output is written simply and directly for non-technical caregivers.
+                            Limit to 4 concise bullet points.
+
+                            Example Format:
+                            - **Observation** → Recommendation.
+                            """
+
+                        prompt = PromptTemplate(
+                            template=prompt_template,
+                            input_variables=["total_sleep", "wake", "rem", "light", "deep"]
+                        )
+
+                        llm = ChatOpenAI(model_name="gpt-4o", temperature=0.7)
+                        chain = LLMChain(llm=llm, prompt=prompt)
+
+                        recommendation = chain.run(
+                            total_sleep=total_sleep,
+                            wake=wake,
+                            rem=rem,
+                            light=light,
+                            deep=deep
+                        )
+
+                        return recommendation
+
+                    if st.button("🤖 Generate AI Clinical Recommendation", use_container_width=True):
+                        with st.spinner("Analyzing sleep data and generating caregiver recommendations..."):
+                            recommendation = get_sleep_recommendation_langchain(df_sleep)
+                        st.markdown("### 🧠 AI-Generated Care Recommendations")
+                        st.info(recommendation)
+
+
+
+    # =========== Tab2: Sleep Benchmarks ==============
+    elif tabs == "📊 Sleep Benchmarks":
+        # Start a div wrapper with fixed width and auto-centered layout
+        st.markdown("""
+            <div style='max-width: 500px; margin: 0 auto; padding: 20px;'>
+        """, unsafe_allow_html=True)
+
+        # Create a single column layout to ensure vertical stacking
+        col = st.columns(1)[0]  # one column, indexed
+
+        with col:
+            # ---- ROW 1: Sleep Benchmark ----
+            with st.container():
+                st.markdown("###### Sleep Benchmark")
+                st.markdown(
+                    """
+                    <style>
+                    div[data-testid="stMetricValue"] {
+                        font-size: 25px !important;
+                    }
+                    div[data-testid="stMetricLabel"] {
+                        font-size: 25px !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+                if df_sleep.empty:
+                    st.warning("No sleep data available for benchmark.")
+                else:
+                    SleepPattern.plot_sleep_benchmark(df_sleep)
+            with st.container(border=True):
                 st.subheader("Sleep Benchmarks")
                 if "ai_recommendation" not in st.session_state:
                     st.session_state["ai_recommendation"] = ""
@@ -303,104 +471,105 @@ if st.session_state["menu_option"] == "Trends":
                     )
 
                     # Button to clear AI recommendation and restore sleep benchmark plot
-                    if st.button("Clear Recommendation"):
-                        st.session_state["ai_recommendation"] = ""
-                        st.session_state["ai_recommendation_generated"] = False
-                        st.rerun()
-        # Sleep Trend Tab
-        with tab3:
-            # ----- SECOND ROW: Sleep Trends & Sleep Patterns -----
-            with st.container():
-                row2_col1, row2_col2 = st.columns(2)
-                
-                with row2_col1:
-                    st.markdown("##### Sleep Trends Over Time")
-                    # Arrange the inputs in one row using columns.
-                    input_cols = st.columns([1, 1, 1])
-                    
-                    with input_cols[0]:
-                        start_date = st.date_input("📅 Start Date", value=pd.to_datetime("2025-02-15"))
-                    with input_cols[1]:
-                        end_date = st.date_input("📅 End Date", value=pd.to_datetime("2025-02-27"))
-                    with input_cols[2]:
-                        period = st.selectbox("Analysis Period", options=["daily", "weekly"], index=0)
-                    
-                    # Convert the dates to string format for the chart function.
-                    start_date_str = start_date.strftime("%Y-%m-%d")
-                    end_date_str = end_date.strftime("%Y-%m-%d")
-                    
-                    # Generate and render the chart.
-                    chart = plot_sleep_trends(start_date=start_date_str, end_date=end_date_str, period=period)
-                    st.altair_chart(chart, use_container_width=True)
-                                
-                with row2_col2:
-                    colored_header(
-                        label= "Weekly Sleep Analysis",
-                        description = "Average Sleep Analysis",
-                        color_name=  "yellow-80",
-                    )
-                    week_data = load_sleep_data_for_week()
-                    total_avg_duration = calculate_average_sleep_duration(week_data)
-                    total_avg_each_stage_duration = analyze_average_stages(week_data)
-                    visualize_avg_sleep_data(total_avg_duration, total_avg_each_stage_duration)        
-        # Sleep Metrics and Stage Transitions Tab
-        with tab4:
-            with st.container():
-                row3_col1, row3_col2 = st.columns(2)
-                with row3_col1:
-                    colored_header(
-                        label= "Sleep Metrics",
-                        description = "Sleep Metrics",
-                        color_name=  "yellow-80",
-                    )
-                    sleep_data = load_sleep_data()
-                    efficiency = calculate_sleep_efficiency_current_day(sleep_data)  # your existing function
-                    if efficiency is not None:
-                        analyze_sleep_quality(efficiency)
-                    with st.container():
-                        row_subcol1, row_subcol2 = st.columns(2)
-                        with row_subcol1:
-                            st.markdown(
-                                    """
-                                    <style>
-                                    div[data-testid="stMetricValue"] {
-                                        font-size: 25px !important;
-                                    }
-                                    div[data-testid="stMetricLabel"] {
-                                        font-size: 25px !important;
-                                    }
-                                    </style>
-                                    """,
-                                    unsafe_allow_html=True
-                                )
-                            latency = calculate_sleep_latency_current_day(sleep_data)
-                            if latency is not None:
-                                st.metric("Sleep Latency", f"{latency:.0f} seconds ({latency/60:.1f} minutes)")
-                        with row_subcol2:
-                            num_awakenings = count_awakenings_current_day(sleep_data)
-                            if num_awakenings is not None:
-                                st.metric("Number of Awakenings", f"{num_awakenings} times")
-                with row3_col2: 
-                    colored_header(
-                        label= "Sleep Transition and Fregementations",
-                        description = "Sleep Transition and Fregementations",
-                        color_name=  "yellow-80",
-                    ) 
-                    analyze_sleep_stage_transitions(df_sleep) 
-        # SPO2 Analysis Tab (Placeholder)
-        with tab5:
-            st.subheader("Blood Oxygen Saturation Analysis During Sleep")
-            with st.container():
-                sp_row1, sp_row2 = st.columns(2)
-                with sp_row1:
-                    #fetch_spo2_data()
-                    spo2_data = SPO2Analyzer.load_spo2_data()
-                    SPO2Analyzer.plot_spo2_last_night(spo2_data)
-                    SPO2Analyzer.plot_spo2_liquid_fill()
-                with sp_row2:
-                    SPO2Analyzer.plot_hr_spo2_last_night()
-
+    
+    # =========== Tab3: Sleep Trend Analysis ==============
+    elif tabs == "📈 Sleep Trend Analysis":
+        # ----- SECOND ROW: Sleep Trends & Sleep Patterns -----
+        with st.container():
+            row2_col1, row2_col2 = st.columns(2)
             
+            with row2_col1:
+                st.markdown("##### Sleep Trends Over Time")
+                # Arrange the inputs in one row using columns.
+                input_cols = st.columns([1, 1, 1])
+                
+                with input_cols[0]:
+                    start_date = st.date_input("📅 Start Date", value=pd.to_datetime("2025-02-15"))
+                with input_cols[1]:
+                    end_date = st.date_input("📅 End Date", value=pd.to_datetime("2025-02-27"))
+                with input_cols[2]:
+                    period = st.selectbox("Analysis Period", options=["daily", "weekly"], index=0)
+                
+                # Convert the dates to string format for the chart function.
+                start_date_str = start_date.strftime("%Y-%m-%d")
+                end_date_str = end_date.strftime("%Y-%m-%d")
+                
+                # Generate and render the chart.
+                chart = plot_sleep_trends(start_date=start_date_str, end_date=end_date_str, period=period)
+                st.altair_chart(chart, use_container_width=True)
+                            
+            with row2_col2:
+                colored_header(
+                    label= "Weekly Sleep Analysis",
+                    description = "Average Sleep Analysis",
+                    color_name=  "yellow-80",
+                )
+                week_data = load_sleep_data_for_week()
+                total_avg_duration = calculate_average_sleep_duration(week_data)
+                total_avg_each_stage_duration = analyze_average_stages(week_data)
+                visualize_avg_sleep_data(total_avg_duration, total_avg_each_stage_duration)   
+
+    # =========== Tab4: Sleep Metrics and Stage Transitions ==============
+    elif tabs == "🔄 Sleep Metrics and Stage Transitions":
+        with st.container():
+            row3_col1, row3_col2 = st.columns(2)
+            with row3_col1:
+                colored_header(
+                    label= "Sleep Metrics",
+                    description = "Sleep Metrics",
+                    color_name=  "yellow-80",
+                )
+                sleep_data = load_sleep_data()
+                efficiency = calculate_sleep_efficiency_current_day(sleep_data)  # your existing function
+                if efficiency is not None:
+                    analyze_sleep_quality(efficiency)
+                with st.container():
+                    row_subcol1, row_subcol2 = st.columns(2)
+                    with row_subcol1:
+                        st.markdown(
+                                """
+                                <style>
+                                div[data-testid="stMetricValue"] {
+                                    font-size: 25px !important;
+                                }
+                                div[data-testid="stMetricLabel"] {
+                                    font-size: 25px !important;
+                                }
+                                </style>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        latency = calculate_sleep_latency_current_day(sleep_data)
+                        if latency is not None:
+                            st.metric("Sleep Latency", f"{latency:.0f} seconds ({latency/60:.1f} minutes)")
+                    with row_subcol2:
+                        num_awakenings = count_awakenings_current_day(sleep_data)
+                        if num_awakenings is not None:
+                            st.metric("Number of Awakenings", f"{num_awakenings} times")
+            with row3_col2: 
+                colored_header(
+                    label= "Sleep Transition and Fregementations",
+                    description = "Sleep Transition and Fregementations",
+                    color_name=  "yellow-80",
+                ) 
+                analyze_sleep_stage_transitions(df_sleep) 
+    # =========== Tab5: Blood Oxygen Saturation Analysis ==============
+    elif tabs == "🩸 Blood Oxygen Saturation Analysis":
+    
+        st.subheader("Blood Oxygen Saturation Analysis During Sleep")
+        with st.container():
+            #sp_row1, _ = st.columns(2)  # Define second column but ignore it
+
+            #with sp_row1:
+                # fetch_spo2_data()
+                spo2_data = SPO2Analyzer.load_spo2_data()
+                SPO2Analyzer.plot_spo2_last_night(spo2_data)
+                SPO2Analyzer.plot_spo2_liquid_fill()
+
+            # Second column intentionally disabled
+            # with sp_row2:
+            #     SPO2Analyzer.plot_hr_spo2_last_night()
+
             # Sleep benchmarks
 
 

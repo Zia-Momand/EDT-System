@@ -9,7 +9,9 @@ st.set_page_config(
 import subprocess
 import os
 import time
-from auth.auth import login_user, register_user
+import uuid
+from streamlit_javascript import st_javascript
+from auth.auth import login_user, register_user, save_login_token, check_token_valid
 from pyngrok import ngrok
 
 # ------------------------
@@ -33,11 +35,21 @@ time.sleep(2)  # Wait for the Flask server to initialize
 # ✅ Streamlit Session State Setup
 # ------------------------
 if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
+    st.session_state.authenticated = False
 if "username" not in st.session_state:
-    st.session_state["username"] = ""
+    st.session_state.username = ""
 if "show_register" not in st.session_state:
-    st.session_state["show_register"] = False  # Default page is login
+    st.session_state.show_register = False # Default page is login
+
+# Attempt to auto-restore session using token from localStorage
+# if not st.session_state.authenticated:
+#     token = st_javascript("window.localStorage.getItem('auth_token');")
+#     if token:
+#         username = check_token_valid(token)
+#         if username:
+#             st.session_state.authenticated = True
+#             st.session_state.username = username
+#             st.rerun()
 
 # Hide sidebar when not authenticated
 #if not st.session_state["authenticated"]:
@@ -84,17 +96,23 @@ def login():
         # Have login_user return either None (bad) or a user-dict on success
         user = login_user(username, password)
         if user:
+            token = str(uuid.uuid4())
             st.session_state["authenticated"] = True
+            #save_login_token(user["username"], token)  # Save in DB
+            #st_javascript(f"window.localStorage.setItem('auth_token', '{token}');")  # Save in browser
+
             st.session_state["username"]      = user["username"]
             st.session_state["first_name"]    = user["first_name"]
             st.session_state["last_name"]     = user["last_name"]
             st.success(f"Welcome, {user['first_name']}!")
+            time.sleep(1)
+            st.rerun()
             st.switch_page("pages/dashboard.py")
         else:
             st.error("Invalid username or password")
 
     if register_clicked:
-        st.session_state["show_register"] = True
+        st.session_state.show_register = True
 
 # ------------------------
 # ✅ Registration Form
@@ -159,11 +177,15 @@ def register():
 # ------------------------
 # ✅ Main UI Logic (Routing)
 # ------------------------
-if not st.session_state["authenticated"]:
-    st.sidebar.empty()  # Hide sidebar when not authenticated
-    if st.session_state["show_register"]:
+if st.session_state.authenticated:
+    st.sidebar.success(f"Logged in as {st.session_state.username}")
+    if st.sidebar.button("Logout"):
+        st_javascript("window.localStorage.removeItem('auth_token');")
+        st.session_state.clear()
+        st.experimental_rerun()
+    st.switch_page("pages/dashboard.py")
+else:
+    if st.session_state.show_register:
         register()
     else:
         login()
-else:
-    st.switch_page("pages/dashboard.py")  # ✅ Redirect to dashboard

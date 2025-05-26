@@ -92,3 +92,20 @@ def login_user(username, password):
         }
 
     return None
+
+def save_login_token(username, token):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET session_token = %s WHERE username = %s", (token, username))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def check_token_valid(token):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users WHERE session_token = %s", (token,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result[0] if result else None
