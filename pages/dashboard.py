@@ -251,9 +251,7 @@ if st.session_state["menu_option"] == "Trends":
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    if st.button("🔍 Explore Interpretation", use_container_width=True):
-                        from collections import defaultdict
-                        
+                    with st.expander("🔍 Explore Interpretation", expanded=False):
                         # --- Transition Matrix & Fragmentation ---
                         df_sorted = df_sleep.sort_values("dateTime").reset_index(drop=True)
                         df_sorted["next_stage"] = df_sorted["level"].shift(-1)
@@ -283,50 +281,39 @@ if st.session_state["menu_option"] == "Trends":
                         # --- Build Interpretation ---
                         summary = []
 
-                        # Sleep Stage Ranges (Clinical references)
-                        # National Sleep Foundation benchmarks
-                        # Percentages based on total sleep time (not enforced strictly here)
                         summary.append("### 🧠 Sleep Interpretation for Caregivers")
 
-                        # Deep Sleep
                         if deep < 30:
-                            summary.append("😴 **Low Deep Sleep**: Deep sleep is less than 30 minutes. This may affect physical restoration and healing.")
+                            summary.append("😴 **Low Deep Sleep**: Less than 30 minutes. May affect physical recovery.")
                         else:
-                            summary.append("💪 **Good Deep Sleep**: Enough deep sleep for body recovery.")
+                            summary.append("💪 **Good Deep Sleep**: Enough deep sleep for body repair.")
 
-                        # REM
                         if rem < 20:
-                            summary.append("💤 **Low REM Sleep**: REM sleep is under 20 minutes. This may reduce emotional and cognitive recovery.")
+                            summary.append("💤 **Low REM Sleep**: Below 20 minutes. May affect emotional or cognitive health.")
                         else:
-                            summary.append("🧠 **Healthy REM Sleep**: Adequate REM helps with memory and emotional health.")
+                            summary.append("🧠 **Healthy REM Sleep**: Supports mental restoration.")
 
-                        # Wake
                         if wake > 60:
-                            summary.append("⏰ **Frequent Awakenings**: Wake time is more than 1 hour. This may indicate fragmented or poor-quality sleep.")
+                            summary.append("⏰ **Frequent Awakenings**: Wake time exceeds 1 hour. May reflect fragmented sleep.")
                         else:
-                            summary.append("✔️ **Stable Sleep Continuity**: Wake time is within normal limits.")
+                            summary.append("✔️ **Stable Sleep Continuity**: Wake time is within normal range.")
 
-                        # Transitions
                         if transitions_per_hour > 10:
-                            summary.append(f"🔄 **High Fragmentation**: {transitions_per_hour:.1f} stage transitions per hour. Sleep was restless with frequent changes.")
+                            summary.append(f"🔄 **High Fragmentation**: {transitions_per_hour:.1f} transitions/hour — indicates restless sleep.")
                         else:
-                            summary.append(f"🔁 **Low Fragmentation**: Only {transitions_per_hour:.1f} transitions per hour — sleep is stable.")
+                            summary.append(f"🔁 **Low Fragmentation**: {transitions_per_hour:.1f} transitions/hour — sleep is stable.")
 
-                        # A→B→A patterns
                         if pattern_count > 5:
-                            summary.append(f"📉 **Frequent Sleep Interruptions**: {pattern_count} unstable stage sequences detected. Consider improving sleep conditions.")
+                            summary.append(f"📉 **Frequent Interruptions**: {pattern_count} stage interruptions detected. Could signal poor sleep environment.")
                         else:
-                            summary.append(f"📈 **Sleep Stage Stability**: Only {pattern_count} unstable sequences — sleep is well-structured.")
+                            summary.append(f"📈 **Stable Patterns**: Only {pattern_count} unstable transitions — sleep looks well-structured.")
 
-                        # Optional: highlight transition anomalies
                         if not transition_prob.empty:
                             most_common_from = transition_prob.idxmax(axis=1).to_dict()
                             if most_common_from.get("light") != "rem":
-                                summary.append("⚠️ **Unusual Stage Transition**: Light sleep is not primarily transitioning into REM. May suggest disruption.")
+                                summary.append("⚠️ **Unusual Transition**: Light sleep is not mainly transitioning to REM, which could indicate disrupted sleep cycling.")
 
                         st.info("\n\n".join(summary))
-
-
 
                 with col2:
 
@@ -395,80 +382,80 @@ if st.session_state["menu_option"] == "Trends":
         with col:
             # ---- ROW 1: Sleep Benchmark ----
             with st.container():
-                st.markdown("###### Sleep Benchmark")
-                st.markdown(
-                    """
-                    <style>
-                    div[data-testid="stMetricValue"] {
-                        font-size: 25px !important;
-                    }
-                    div[data-testid="stMetricLabel"] {
-                        font-size: 25px !important;
-                    }
-                    </style>
-                    """,
-                    unsafe_allow_html=True
-                )
-                if df_sleep.empty:
-                    st.warning("No sleep data available for benchmark.")
-                else:
-                    SleepPattern.plot_sleep_benchmark(df_sleep)
-            with st.container(border=True):
-                st.subheader("Sleep Benchmarks")
-                if "ai_recommendation" not in st.session_state:
-                    st.session_state["ai_recommendation"] = ""
-                if "ai_recommendation_generated" not in st.session_state:
-                    st.session_state["ai_recommendation_generated"] = False
-
-                def display_ai_recommendation(details: str, recommendation: str):
-                    """ Function to process AI recommendation and update session state with streaming text """
-                    final_message = (
-                        f"**Abnormal Sleep Stage Details:**\n\n{details}\n\n"
-                        f"**Your Personalized Sleep Recommendation:**\n\n"
-                    )
-
-                    st.session_state["ai_recommendation"] = final_message
-                    st.session_state["ai_recommendation_generated"] = True
-
-                    recommendation_container = st.empty()  # Create a placeholder for streaming
-
-                    streamed_text = ""
-                    words = recommendation.split()
-
-                    for i, word in enumerate(words):
-                        streamed_text += word + " "
-                        recommendation_container.markdown(
-                            f'<div id="ai_recommendation_div" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">'
-                            f'{st.session_state["ai_recommendation"]}{streamed_text} ✨'
-                            f"</div>",
-                            unsafe_allow_html=True
-                        )
-                        time.sleep(0.05)  # Adjust speed for better streaming effect
-                    
-                    # Store final streamed text in session state to persist
-                    st.session_state["ai_recommendation"] += streamed_text
-
-                st.markdown("##### Sleep Benchmark")
-
-                if not st.session_state["ai_recommendation_generated"]:
-                    # Display the sleep benchmark plot only if the AI recommendation is not generated
-                    st.markdown('<div id="sleep_benchmark_plot">', unsafe_allow_html=True)
-                    if not df_sleep.empty:
-                        SleepPattern.plot_sleep_benchmark(df_sleep, toast_callback=display_ai_recommendation)
-                    else:
-                        st.warning("No sleep data available for benchmark.")
-                    st.markdown("</div>", unsafe_allow_html=True)
-
-                # Show AI Recommendation section only if the session state is active
-                if st.session_state["ai_recommendation_generated"]:
-                    
-                    # Display final streamed recommendation (if available)
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    st.markdown("###### Sleep Benchmark")
                     st.markdown(
-                        f'<div id="ai_recommendation_div" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">'
-                        f'{st.session_state["ai_recommendation"]}'
-                        f"</div>",
+                        """
+                        <style>
+                        div[data-testid="stMetricValue"] {
+                            font-size: 25px !important;
+                        }
+                        div[data-testid="stMetricLabel"] {
+                            font-size: 25px !important;
+                        }
+                        </style>
+                        """,
                         unsafe_allow_html=True
                     )
+                    if df_sleep.empty:
+                        st.warning("No sleep data available for benchmark.")
+                    else:
+                        SleepPattern.plot_sleep_benchmark(df_sleep)
+                        recommendation_box = st.empty()
+                        with st.expander("🤖 See Interpretation", expanded=False):
+                            with st.spinner("Analyzing sleep benchmarks..."):
+                                benchmark_text = SleepPattern.get_sleep_benchmark_interpretation(df_sleep)
+                            st.info(benchmark_text)
+
+
+                with col2:
+                    st.markdown("###### 🧠 AI-Generated Sleep Recommendations")
+                    recommendation_box = st.empty()
+
+                    # Automatically generate benchmark summary and AI recommendation
+                    grouped = df_sleep.groupby("level")["seconds"].sum().reset_index()
+                    total_seconds = grouped["seconds"].sum()
+
+                    if total_seconds == 0:
+                        recommendation_box.warning("No sleep benchmark data available.")
+                    else:
+                        level_mapping = {"wake": "Awake", "rem": "REM", "light": "Light", "deep": "Deep"}
+                        typical_ranges = {
+                            "Awake": (10, 20),
+                            "REM": (15, 25),
+                            "Light": (40, 60),
+                            "Deep": (10, 20)
+                        }
+
+                        details = ""
+                        for _, row in grouped.iterrows():
+                            original_level = row["level"]
+                            stage = level_mapping.get(original_level, original_level)
+                            secs = row["seconds"]
+                            minutes = secs // 60
+                            perc = round((secs / total_seconds) * 100)
+                            tmin, tmax = typical_ranges.get(stage, (0, 100))
+
+                            if perc < tmin or perc > tmax:
+                                details += (
+                                    f"Stage: {stage} – Duration: {minutes} min, "
+                                    f"Percentage: {perc}% (Expected: {tmin}% to {tmax}%)\n"
+                                )
+
+                        if details:
+                            with st.spinner("Generating personalized sleep recommendations..."):
+                                ai_recommendation = SleepPattern.get_ai_recommendation(details)
+
+                            def stream_recommendation():
+                                for word in ai_recommendation.split():
+                                    yield word + " "
+                                    time.sleep(0.05)
+
+                            recommendation_box.write_stream(stream_recommendation)
+                        else:
+                            recommendation_box.success("✅ Sleep stages are within normal ranges. No clinical concerns detected.")
+                            st.markdown("</div>", unsafe_allow_html=True)  # Close the div wrapper        
 
                     # Button to clear AI recommendation and restore sleep benchmark plot
     
@@ -520,7 +507,7 @@ if st.session_state["menu_option"] == "Trends":
                     color_name=  "yellow-80",
                 )
                 sleep_data = load_sleep_data()
-                efficiency = calculate_sleep_efficiency_current_day(sleep_data)  # your existing function
+                efficiency = calculate_sleep_efficiency_current_day(sleep_data)  
                 if efficiency is not None:
                     analyze_sleep_quality(efficiency)
                 with st.container():

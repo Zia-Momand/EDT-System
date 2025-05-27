@@ -4997,3 +4997,294 @@
 2025-05-26 22:45:28,731 - INFO - [User: Momand] [Session: 1555e467-358f-4d8c-8c01-223c52266d0a] [IP: 171.7.112.36] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
 2025-05-26 22:45:28,740 - INFO - [User: Momand] [Session: 1555e467-358f-4d8c-8c01-223c52266d0a] - `process_sleep_data` completed.
 2025-05-26 22:45:36,177 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 09:48:29,742 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 09:48:29,747 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 09:48:30,067 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 09:48:30,128 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 09:48:30,475 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 09:48:30,567 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 09:48:42,904 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 09:48:42,906 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 09:48:43,236 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 09:48:43,245 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 09:48:43,570 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 09:48:43,610 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 09:48:49,768 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 09:49:04,826 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 09:49:04,829 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 09:49:05,186 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 09:49:05,195 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:23:19,547 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:23:19,550 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:23:19,879 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:23:19,907 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:18,815 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:18,818 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:19,227 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:19,235 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:27,983 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 10:25:28,443 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:28,445 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:28,774 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:28,783 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:35,999 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:36,001 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:36,323 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:36,332 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:36,701 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_trends`
+2025-05-27 10:25:37,040 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:37,041 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:37,376 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:37,385 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:37,757 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:37,758 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:38,077 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:38,097 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:25:38,098 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_trends` completed.
+2025-05-27 10:25:38,549 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:25:38,551 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:25:38,865 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:25:38,874 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:37:40,775 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:37:40,778 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:37:41,100 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:37:41,128 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:37:49,595 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:37:49,597 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:37:49,946 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:37:49,955 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:40:09,648 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:40:09,651 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:40:10,058 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:40:10,068 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:40:16,069 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:40:16,071 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:40:16,389 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:40:16,399 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:43:25,547 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:43:25,554 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:43:25,903 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:43:25,931 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:43:51,002 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:43:51,005 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:43:51,335 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:43:51,344 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:46:36,792 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:46:36,797 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:46:37,192 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:46:37,201 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:52:13,533 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:52:13,539 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:52:13,889 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:52:13,916 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:52:18,659 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 10:52:18,661 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 10:52:19,061 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 10:52:19,070 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 10:52:22,973 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:06:37,566 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:06:37,573 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:06:37,913 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:06:37,935 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:06:43,667 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:07:13,971 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:07:13,976 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:07:14,287 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:07:14,297 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:07:19,162 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:07:19,164 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:07:19,479 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:07:19,488 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:07:25,923 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:10:26,874 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:10:26,879 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:10:27,216 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:10:27,244 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:10:32,052 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:10:59,343 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:10:59,346 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:10:59,676 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:10:59,684 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:11:05,090 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:15:22,159 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:15:22,164 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:15:22,477 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:15:22,486 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:15:28,837 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:16:24,291 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:24,293 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:24,664 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:24,675 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:25,347 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_trends`
+2025-05-27 11:16:25,676 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:25,678 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:26,079 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:26,088 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:26,487 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:26,489 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:26,897 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:26,906 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:27,313 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:27,315 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:27,631 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:27,642 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:27,966 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:27,968 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:28,292 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:28,303 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:28,747 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:28,748 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:29,054 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:29,057 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:29,364 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:29,366 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:29,708 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:29,717 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:30,068 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:30,070 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:30,400 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:30,409 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:30,787 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:30,789 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:31,126 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:31,135 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:31,487 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:31,489 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:31,918 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:31,926 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:32,323 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:32,324 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:32,732 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:32,741 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:33,239 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:33,241 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:33,656 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:33,665 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:34,065 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:34,066 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:34,401 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:34,414 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:34,881 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:34,883 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:35,292 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:35,300 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:35,326 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_trends` completed.
+2025-05-27 11:16:40,855 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:40,858 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:16:41,174 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:16:41,183 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:16:41,514 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:16:41,516 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:22:52,613 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:22:52,616 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:22:52,926 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:22:52,936 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:22:53,287 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:22:53,290 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:23:02,208 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:23:02,209 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:23:02,636 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:23:02,646 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:23:10,532 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:23:21,824 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:23:21,826 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:23:22,149 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:23:22,158 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:23:25,393 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:23:25,395 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:23:25,727 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:23:25,737 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:23:27,121 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:23:31,043 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:23:56,461 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:23:56,464 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:23:56,966 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:23:56,974 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:23:57,566 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 11:23:57,613 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 11:24:50,364 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:24:50,366 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:24:50,696 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:24:50,706 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:24:51,033 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 11:24:51,076 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 11:25:06,112 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:25:06,115 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:25:06,438 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:25:06,447 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:25:11,807 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:25:20,053 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:25:20,055 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:25:20,464 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:25:20,473 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:25:20,814 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 11:25:20,857 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 11:27:10,950 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:27:10,954 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:27:11,276 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:27:11,285 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:27:11,599 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-05-27 11:27:11,639 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_sleep_stages` completed.
+2025-05-27 11:27:19,291 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:27:19,294 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:27:19,609 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:27:19,617 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:27:27,594 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:28:11,397 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-05-27 11:28:11,401 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_sleep_data` completed.
+2025-05-27 11:28:11,759 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-05-27 11:28:11,768 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_sleep_data` completed.
+2025-05-27 11:28:17,150 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:30:17,849 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-05-27 11:30:18,183 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-05-27 11:30:18,188 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_heart_rate_data_for_day` completed.
+2025-05-27 11:30:18,498 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-05-27 11:30:18,549 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_heart_rate_data` completed.
+2025-05-27 11:30:18,603 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_heart_rate_for_day` completed.
+2025-05-27 11:30:19,005 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-05-27 11:30:19,008 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_heart_rate_data_for_day` completed.
+2025-05-27 11:30:19,426 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-05-27 11:30:19,470 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_heart_rate_data` completed.
+2025-05-27 11:30:19,823 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-05-27 11:30:20,341 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-05-27 11:30:20,344 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_heart_rate_data_for_day` completed.
+2025-05-27 11:30:20,655 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-05-27 11:30:20,701 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_heart_rate_data` completed.
+2025-05-27 11:30:20,739 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_heart_rate_for_day` completed.
+2025-05-27 11:30:21,049 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-05-27 11:30:21,050 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_heart_rate_data_for_day` completed.
+2025-05-27 11:30:21,362 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-05-27 11:30:21,407 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `process_heart_rate_data` completed.
+2025-05-27 11:30:21,770 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-05-27 11:30:21,772 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_weekly_heart_rate_data` completed.
+2025-05-27 11:30:22,177 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_weekly_heart_rate`
+2025-05-27 11:30:22,487 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-05-27 11:30:22,488 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_weekly_heart_rate_data` completed.
+2025-05-27 11:30:22,489 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_weekly_heart_rate` completed.
+2025-05-27 11:30:33,999 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:30:34,371 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `plot_rmssd_trends`
+2025-05-27 11:30:34,774 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-05-27 11:30:34,781 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `load_heart_rate_data_for_day` completed.
+2025-05-27 11:30:35,186 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] [IP: 171.7.119.55] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
+2025-05-27 11:30:35,365 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `calculate_rmssd_for_5min_intervals` completed.
+2025-05-27 11:30:35,424 - INFO - [User: Momand] [Session: 87b989b8-eec6-483b-9dd4-59c18d32877b] - `plot_rmssd_trends` completed.
+2025-05-27 11:32:21,891 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:32:29,689 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-27 11:32:31,969 - INFO - HTTP Request: POST https://ebjqsydpagnpmiqmttmf.supabase.co/rest/v1/rpc/match_documents?limit=4 "HTTP/2 200 OK"
+2025-05-27 11:32:32,702 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:32:57,239 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:32:57,935 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-27 11:32:59,169 - INFO - HTTP Request: POST https://ebjqsydpagnpmiqmttmf.supabase.co/rest/v1/rpc/match_documents?limit=4 "HTTP/2 200 OK"
+2025-05-27 11:33:00,389 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:33:53,740 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:33:54,870 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-27 11:33:55,997 - INFO - HTTP Request: POST https://ebjqsydpagnpmiqmttmf.supabase.co/rest/v1/rpc/match_documents?limit=4 "HTTP/2 200 OK"
+2025-05-27 11:33:57,326 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:34:26,509 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:34:27,436 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-27 11:34:28,634 - INFO - HTTP Request: POST https://ebjqsydpagnpmiqmttmf.supabase.co/rest/v1/rpc/match_documents?limit=4 "HTTP/2 200 OK"
+2025-05-27 11:34:29,383 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:34:50,165 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-27 11:34:50,953 - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-05-27 11:34:51,999 - INFO - HTTP Request: POST https://ebjqsydpagnpmiqmttmf.supabase.co/rest/v1/rpc/match_documents?limit=4 "HTTP/2 200 OK"
+2025-05-27 11:34:52,698 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"

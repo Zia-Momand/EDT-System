@@ -81,21 +81,7 @@ class SleepPattern:
 
         abnormal_stages = df_bench[df_bench["alert"] != ""]
 
-        if not abnormal_stages.empty and not st.session_state.get("ai_recommendation_generated", False):
-            # Build detailed abnormal values string
-            details = "\n".join(
-                f"Stage: {row['stage']} – Duration: {row['user_minutes']} min, Percentage: {row['user_percentage']}% (Expected: {row['typical_min']}% to {row['typical_max']}%)"
-                for row in abnormal_stages.to_dict("records")
-            )
-            st.warning("Sleep abnormalities detected:\n" + details)
-
-            # Button to generate AI recommendation
-            if st.button("Generate Care Recommendation"):
-                recommendation = SleepPattern.get_ai_recommendation(details)
-                if toast_callback:
-                    toast_callback(details, recommendation)
-                st.session_state["ai_recommendation_generated"] = True
-                st.rerun()
+           
 
         # --- 3) Sort by a custom order ---
         stage_order = ["Awake", "REM", "Light", "Deep"]
@@ -179,6 +165,43 @@ class SleepPattern:
         except Exception as e:
             return f"Error generating recommendation: {e}"
         
+#============================ Sleep benchmarking interpretation ============================
+    @staticmethod
+    def get_sleep_benchmark_interpretation(df_sleep):
+      
+        # Step 1: Aggregate sleep durations by stage
+        grouped = df_sleep.groupby("level")["seconds"].sum().reset_index()
+        total_seconds = grouped["seconds"].sum()
+        if total_seconds == 0:
+            return "No sleep data available for interpretation."
+
+        # Step 2: Mapping and thresholds
+        level_mapping = {"wake": "Awake", "rem": "REM", "light": "Light", "deep": "Deep"}
+        typical_ranges = {
+            "Awake": (10, 20),
+            "REM": (15, 25),
+            "Light": (40, 60),
+            "Deep": (10, 20)
+        }
+
+        # Step 3: Build interpreted data
+        messages = ["### 🧠 Sleep Benchmark Interpretation"]
+
+        for _, row in grouped.iterrows():
+            original_level = row["level"]
+            stage = level_mapping.get(original_level, original_level)
+            duration_sec = row["seconds"]
+            perc = round((duration_sec / total_seconds) * 100)
+            tmin, tmax = typical_ranges.get(stage, (0, 100))
+
+            if perc < tmin:
+                messages.append(f"🔻 **Low {stage} Sleep**: Only {perc}% (expected {tmin}–{tmax}%). Try improving this stage through relaxation or routine.")
+            elif perc > tmax:
+                messages.append(f"🔺 **High {stage} Sleep**: {perc}%, which is above the typical range ({tmin}–{tmax}%).")
+            else:
+                messages.append(f"✅ **Normal {stage} Sleep**: {perc}% — within healthy range.")
+
+        return "\n\n".join(messages)
 
 # ================================ weekly sleep analysis ================================
 
