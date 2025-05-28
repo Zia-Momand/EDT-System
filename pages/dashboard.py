@@ -21,6 +21,7 @@ from spo2.spo2patterns import SPO2Analyzer
 from streamlit_echarts import st_echarts
 from logger_manager import LoggerManager
 from streamlit_shadcn_ui import tabs
+from langchain.schema import HumanMessage, AIMessage
 
 # # Load environment variables from the .env file
 load_dotenv()
@@ -545,19 +546,70 @@ if st.session_state["menu_option"] == "Trends":
     
         st.subheader("Blood Oxygen Saturation Analysis During Sleep")
         with st.container():
-            #sp_row1, _ = st.columns(2)  # Define second column but ignore it
-
-            #with sp_row1:
+            col1, col2 = st.columns([2, 2])
+            with col1:
                 # fetch_spo2_data()
                 spo2_data = SPO2Analyzer.load_spo2_data()
                 SPO2Analyzer.plot_spo2_last_night(spo2_data)
+            with col2:
                 SPO2Analyzer.plot_spo2_liquid_fill()
+        recommendation = st.session_state.get("spo2_recommendation", None)
+        if recommendation:
+            with st.container(border=False):
+                st.markdown("""
+                    <style>
+                    div[data-testid="column"] > div {
+                        border: none !important;
+                        box-shadow: none !important;
+                        padding: 0px !important;
+                    }
+                    </style>
+                """, unsafe_allow_html=True)
+                lef, center, right = st.columns([1,4,1])
+                with center:     
+                    st.markdown("### 🧠 AI-Generated Care Recommendations (SpO₂)")
+                    st.info(recommendation)
 
-            # Second column intentionally disabled
-            # with sp_row2:
-            #     SPO2Analyzer.plot_hr_spo2_last_night()
+                    # Initialize chat history for SpO2 context
+                    if "spo2_chat_history" not in st.session_state:
+                        st.session_state.spo2_chat_history = [
+                            AIMessage(content="Do you have follow-up questions about the SpO₂ recommendation?")
+                        ]
 
-            # Sleep benchmarks
+                    # Display chat history
+                    for msg in st.session_state.spo2_chat_history:
+                        with st.chat_message("ai" if isinstance(msg, AIMessage) else "user"):
+                            st.markdown(msg.content)
+
+                    # Chat input for follow-up
+                    user_input = st.chat_input("Ask a follow-up question about the SpO₂ recommendation")
+
+                    if user_input:
+                        # Append user message
+                        st.session_state.spo2_chat_history.append(HumanMessage(content=user_input))
+                        with st.chat_message("user"):
+                            st.markdown(user_input)
+
+                        with st.chat_message("ai"):
+                            with st.spinner("Thinking..."):
+                                chat = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
+                                context_prompt = f"""
+                                    You are assisting a caregiver who received the following sleep-related blood oxygen recommendation:
+
+                                    \"\"\"{recommendation}\"\"\"
+
+                                    The caregiver now asks:
+                                    \"\"\"{user_input}\"\"\"
+
+                                    Please respond simply, kindly, and without medical jargon.
+                                    """
+                                response = chat([HumanMessage(content=context_prompt)])
+                                st.markdown(response.content)
+                                st.session_state.spo2_chat_history.append(AIMessage(content=response.content))
+            
+
+
+# =========== Heart Model Section ==============
 
 
 elif st.session_state["menu_option"] == "heart_model":
