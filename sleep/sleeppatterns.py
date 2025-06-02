@@ -88,13 +88,7 @@ class SleepPattern:
             )
             st.warning("Sleep abnormalities detected:\n" + details)
 
-            # Button to generate AI recommendation
-            if st.button("Generate Care Recommendation"):
-                recommendation = SleepPattern.get_ai_recommendation(details)
-                if toast_callback:
-                    toast_callback(details, recommendation)
-                st.session_state["ai_recommendation_generated"] = True
-                st.rerun()
+            
 
         # --- 3) Sort by a custom order ---
         stage_order = ["Awake", "REM", "Light", "Deep"]
@@ -132,6 +126,14 @@ class SleepPattern:
 
         chart = alt.layer(typical_range_chart, user_bar_chart, text_labels).properties(width=500, height=180)
         st.altair_chart(chart, use_container_width=True)
+
+        # Button to generate AI recommendation
+        if st.button("Ask AI for Recommendation!"):
+            recommendation = SleepPattern.get_ai_recommendation(details)
+            if toast_callback:
+                toast_callback(details, recommendation)
+            st.session_state["ai_recommendation_generated"] = True
+            st.rerun()
 
     @staticmethod
     def get_ai_recommendation(abnormal_details: str) -> str:
