@@ -67,9 +67,14 @@ _MAX_UNEVALUATED_DF_ROWS = 10000
 
 _PANDAS_DATA_OBJECT_TYPE_RE: Final = re.compile(r"^pandas.*$")
 
-_DASK_DATAFRAME: Final = "dask.dataframe.core.DataFrame"
-_DASK_INDEX: Final = "dask.dataframe.core.Index"
-_DASK_SERIES: Final = "dask.dataframe.core.Series"
+_DASK_DATAFRAME: Final = "dask.dataframe.dask_expr._collection.DataFrame"
+_DASK_SERIES: Final = "dask.dataframe.dask_expr._collection.Series"
+_DASK_INDEX: Final = "dask.dataframe.dask_expr._collection.Index"
+# Dask removed the old legacy types, to support older and newer versions
+# we are still supporting the old an new types.
+_DASK_DATAFRAME_LEGACY: Final = "dask.dataframe.core.DataFrame"
+_DASK_SERIES_LEGACY: Final = "dask.dataframe.core.Series"
+_DASK_INDEX_LEGACY: Final = "dask.dataframe.core.Index"
 _DUCKDB_RELATION: Final = "duckdb.duckdb.DuckDBPyRelation"
 _MODIN_DF_TYPE_STR: Final = "modin.pandas.dataframe.DataFrame"
 _MODIN_SERIES_TYPE_STR: Final = "modin.pandas.series.Series"
@@ -314,7 +319,7 @@ def is_dataframe_like(obj: object) -> bool:
 
 
 def is_unevaluated_data_object(obj: object) -> bool:
-    """True if the object is one of the supported unevaluated data objects:
+    """True if the object is one of the supported unevaluated data objects.
 
     Currently supported objects are:
     - Snowpark DataFrame / Table
@@ -367,7 +372,7 @@ def is_snowpark_row_list(obj: object) -> bool:
 
 
 def is_pyspark_data_object(obj: object) -> bool:
-    """True if obj is a PySpark or PySpark Connect dataframe"""
+    """True if obj is a PySpark or PySpark Connect dataframe."""
     return (
         is_type(obj, _PYSPARK_DF_TYPE_STR) or is_type(obj, _PYSPARK_CONNECT_DF_TYPE_STR)
     ) and has_callable_attr(obj, "toPandas")
@@ -377,13 +382,16 @@ def is_dask_object(obj: object) -> bool:
     """True if obj is a Dask DataFrame, Series, or Index."""
     return (
         is_type(obj, _DASK_DATAFRAME)
+        or is_type(obj, _DASK_DATAFRAME_LEGACY)
         or is_type(obj, _DASK_SERIES)
+        or is_type(obj, _DASK_SERIES_LEGACY)
         or is_type(obj, _DASK_INDEX)
+        or is_type(obj, _DASK_INDEX_LEGACY)
     )
 
 
 def is_modin_data_object(obj: object) -> bool:
-    """True if obj is of Modin Dataframe or Series"""
+    """True if obj is of Modin Dataframe or Series."""
     return is_type(obj, _MODIN_DF_TYPE_STR) or is_type(obj, _MODIN_SERIES_TYPE_STR)
 
 
@@ -498,7 +506,7 @@ def _fix_column_naming(data_df: DataFrame) -> DataFrame:
         # Pandas automatically names the first column with 0 if it is not named.
         # We rename it to "value" to make it more descriptive if there is only
         # one column in the dataframe.
-        data_df.rename(columns={0: "value"}, inplace=True)
+        data_df = data_df.rename(columns={0: "value"})
     return data_df
 
 
@@ -551,13 +559,13 @@ def convert_anything_to_pandas_df(
     import pandas as pd
 
     if isinstance(data, pd.DataFrame):
-        return data.copy() if ensure_copy else cast(pd.DataFrame, data)
+        return data.copy() if ensure_copy else cast("pd.DataFrame", data)
 
     if isinstance(data, (pd.Series, pd.Index, pd.api.extensions.ExtensionArray)):
         return pd.DataFrame(data)
 
     if is_pandas_styler(data):
-        return cast(pd.DataFrame, data.data.copy() if ensure_copy else data.data)
+        return cast("pd.DataFrame", data.data.copy() if ensure_copy else data.data)
 
     if isinstance(data, np.ndarray):
         return (
@@ -581,7 +589,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `collect()` on the dataframe to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_xarray_dataset(data):
         if ensure_copy:
@@ -606,7 +614,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `compute()` on the data object to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_ray_dataset(data):
         data = data.limit(max_unevaluated_rows).to_pandas()
@@ -616,7 +624,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `to_pandas()` on the dataset to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_modin_data_object(data):
         data = data.head(max_unevaluated_rows)._to_pandas()
@@ -629,7 +637,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `_to_pandas()` on the data object to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_pyspark_data_object(data):
         data = data.limit(max_unevaluated_rows).toPandas()
@@ -638,7 +646,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `toPandas()` on the data object to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_snowpandas_data_object(data):
         data = data[:max_unevaluated_rows].to_pandas()
@@ -651,7 +659,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `to_pandas()` on the data object to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_snowpark_data_object(data):
         data = data.limit(max_unevaluated_rows).to_pandas()
@@ -660,7 +668,7 @@ def convert_anything_to_pandas_df(
                 f"⚠️ Showing only {string_util.simplify_number(max_unevaluated_rows)} "
                 "rows. Call `to_pandas()` on the data object to show more."
             )
-        return cast(pd.DataFrame, data)
+        return cast("pd.DataFrame", data)
 
     if is_duckdb_relation(data):
         data = data.limit(max_unevaluated_rows).df()
@@ -792,7 +800,7 @@ def convert_arrow_table_to_arrow_bytes(table: pa.Table) -> bytes:
     writer = pa.RecordBatchStreamWriter(sink, table.schema)
     writer.write_table(table)
     writer.close()
-    return cast(bytes, sink.getvalue().to_pybytes())
+    return cast("bytes", sink.getvalue().to_pybytes())
 
 
 def convert_pandas_df_to_arrow_bytes(df: DataFrame) -> bytes:
@@ -849,7 +857,8 @@ def convert_arrow_bytes_to_pandas_df(source: bytes) -> DataFrame:
 
 def _show_data_information(msg: str) -> None:
     """Show a message to the user with important information
-    about the processed dataset."""
+    about the processed dataset.
+    """
     from streamlit.delta_generator_singletons import get_dg_singleton_instance
 
     get_dg_singleton_instance().main_dg.caption(msg)
@@ -902,7 +911,6 @@ def convert_anything_to_list(obj: OptionSequence[V_co]) -> list[V_co]:
 
     Parameters
     ----------
-
     obj : dataframe-, array-, or collections-like object
         The object to convert to a list.
 
@@ -943,7 +951,7 @@ def convert_anything_to_list(obj: OptionSequence[V_co]) -> list[V_co]:
         return (
             []
             if data_df.empty
-            else cast(list[V_co], list(data_df.iloc[:, 0].to_list()))
+            else cast("list[V_co]", list(data_df.iloc[:, 0].to_list()))
         )
     except errors.StreamlitAPIException:
         # Wrap the object into a list
@@ -1027,7 +1035,8 @@ def _maybe_truncate_table(
 
 def is_colum_type_arrow_incompatible(column: Series[Any] | Index) -> bool:
     """Return True if the column type is known to cause issues during
-    Arrow conversion."""
+    Arrow conversion.
+    """
     from pandas.api.types import infer_dtype, is_dict_like, is_list_like
 
     if column.dtype.kind in [
@@ -1158,7 +1167,7 @@ def determine_data_format(input_data: Any) -> DataFormat:
     elif isinstance(input_data, pd.DataFrame):
         return DataFormat.PANDAS_DATAFRAME
     elif isinstance(input_data, np.ndarray):
-        if len(cast(NumpyShape, input_data.shape)) == 1:
+        if len(cast("NumpyShape", input_data.shape)) == 1:
             # For technical reasons, we need to distinguish one
             # one-dimensional numpy array from multidimensional ones.
             return DataFormat.NUMPY_LIST
@@ -1260,8 +1269,13 @@ def _unify_missing_values(df: DataFrame) -> DataFrame:
     which is the only missing value type that is supported by all data
     """
     import numpy as np
+    import pandas as pd
 
-    return df.fillna(np.nan).replace([np.nan], [None]).infer_objects()
+    # Replace all recognized nulls (np.nan, pd.NA, NaT) with None
+    # then infer objects without creating a separate copy:
+    # For performance reasons, we could use copy=False here.
+    # However, this is only available in pandas >=2.
+    return df.replace([pd.NA, pd.NaT, np.nan], None).infer_objects()
 
 
 def _pandas_df_to_series(df: DataFrame) -> Series[Any]:

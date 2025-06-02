@@ -27,7 +27,6 @@ from typing_extensions import TypeAlias
 from streamlit import runtime, url_util
 from streamlit.errors import StreamlitAPIException
 from streamlit.runtime import caching
-from streamlit.type_util import NumpyShape
 
 if TYPE_CHECKING:
     from typing import Any
@@ -36,6 +35,7 @@ if TYPE_CHECKING:
     from PIL import GifImagePlugin, Image, ImageFile
 
     from streamlit.proto.Image_pb2 import ImageList as ImageListProto
+    from streamlit.type_util import NumpyShape
 
 PILImage: TypeAlias = Union[
     "ImageFile.ImageFile", "Image.Image", "GifImagePlugin.GifImageFile"
@@ -99,7 +99,7 @@ def _validate_image_format_string(
     """
     format = format.upper()
     if format in {"JPEG", "PNG"}:
-        return cast(ImageFormat, format)
+        return cast("ImageFormat", format)
 
     # We are forgiving on the spelling of JPEG
     if format == "JPG":
@@ -241,7 +241,7 @@ def image_to_url(
     If `image` is already a URL, return it unmodified.
     Otherwise, add the image to the MediaFileManager and return the URL.
     (When running in "raw" mode, we won't actually load data into the
-    MediaFileManager, and we'll return an empty URL.)
+    MediaFileManager, and we'll return an empty URL).
     """
     import numpy as np
     from PIL import Image, ImageFile
@@ -315,7 +315,7 @@ def image_to_url(
         image = _clip_image(_verify_np_shape(image), clamp)
 
         if channels == "BGR":
-            if len(cast(NumpyShape, image.shape)) == 3:
+            if len(cast("NumpyShape", image.shape)) == 3:
                 image = image[:, :, [2, 1, 0]]
             else:
                 raise StreamlitAPIException(
@@ -344,7 +344,7 @@ def image_to_url(
 
 
 def _4d_to_list_3d(array: npt.NDArray[Any]) -> list[npt.NDArray[Any]]:
-    return [array[i, :, :, :] for i in range(0, array.shape[0])]
+    return [array[i, :, :, :] for i in range(array.shape[0])]
 
 
 def marshall_images(
@@ -359,6 +359,7 @@ def marshall_images(
 ) -> None:
     """Fill an ImageListProto with a list of images and their captions.
     The images will be resized and reformatted as necessary.
+
     Parameters
     ----------
     coordinates
@@ -395,22 +396,24 @@ def marshall_images(
     """
     import numpy as np
 
-    channels = cast(Channels, channels.upper())
+    channels = cast("Channels", channels.upper())
 
     # Turn single image and caption into one element list.
     images: Sequence[AtomicImage]
     if isinstance(image, (list, set, tuple)):
         images = list(image)
-    elif isinstance(image, np.ndarray) and len(cast(NumpyShape, image.shape)) == 4:
+    elif isinstance(image, np.ndarray) and len(cast("NumpyShape", image.shape)) == 4:
         images = _4d_to_list_3d(image)
     else:
-        images = [image]  # type: ignore
+        images = cast("Sequence[AtomicImage]", [image])
 
     if isinstance(caption, list):
         captions: Sequence[str | None] = caption
     elif isinstance(caption, str):
         captions = [caption]
-    elif isinstance(caption, np.ndarray) and len(cast(NumpyShape, caption.shape)) == 1:
+    elif (
+        isinstance(caption, np.ndarray) and len(cast("NumpyShape", caption.shape)) == 1
+    ):
         captions = caption.tolist()
     elif caption is None:
         captions = [None] * len(images)

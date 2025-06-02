@@ -43,7 +43,8 @@ class DeprecationError(Error):
 
 class FragmentStorageKeyError(Error, KeyError):
     """A KeyError raised when a KeyError is encountered during a FragmentStorage
-    operation."""
+    operation.
+    """
 
     pass
 
@@ -150,7 +151,8 @@ class StreamlitAPIWarning(StreamlitAPIException, Warning):
 
 class StreamlitModuleNotFoundError(StreamlitAPIWarning):
     """Print a pretty message when a Streamlit command requires a dependency
-    that is not one of our core dependencies."""
+    that is not one of our core dependencies.
+    """
 
     def __init__(self, module_name, *args):
         message = (
@@ -338,7 +340,7 @@ class StreamlitValueAboveMaxError(LocalizableStreamlitException):
 
     def __init__(self, value: int | float, max_value: int | float):
         super().__init__(
-            "The `value` {value} is greater than than the `max_value` {max_value}.",
+            "The `value` {value} is greater than the `max_value` {max_value}.",
             value=value,
             max_value=max_value,
         )
@@ -376,21 +378,23 @@ class StreamlitMissingPageLabelError(LocalizableStreamlitException):
 class StreamlitPageNotFoundError(LocalizableStreamlitException):
     """Exception raised the linked page can not be found."""
 
-    def __init__(self, page: str, main_script_directory: str, is_mpa_v2: bool):
+    def __init__(
+        self, page: str, main_script_directory: str, uses_pages_directory: bool
+    ):
         directory = os.path.basename(main_script_directory)
 
         message = (
-            "Could not find page: `{page}`. You must provide a file path "
-            "relative to the entrypoint file (from the directory `{directory}`). "
-            "Only the entrypoint file and files in the `pages/` directory are supported."
+            "Could not find page: `{page}`. You must provide a `StreamlitPage` "
+            "object or file path relative to the entrypoint file. Only pages "
+            "previously defined by `st.Page` and passed to `st.navigation` are "
+            "allowed."
         )
 
-        if is_mpa_v2:
+        if uses_pages_directory:
             message = (
-                "Could not find page: `{page}`. You must provide a `StreamlitPage` "
-                "object or file path relative to the entrypoint file. Only pages "
-                "previously defined by `st.Page` and passed to `st.navigation` are "
-                "allowed."
+                "Could not find page: `{page}`. You must provide a file path "
+                "relative to the entrypoint file (from the directory `{directory}`). "
+                "Only the entrypoint file and files in the `pages/` directory are supported."
             )
 
         super().__init__(
@@ -447,4 +451,26 @@ class StreamlitBadTimeStringError(LocalizableStreamlitException):
             "Time string doesn't look right. It should be formatted as"
             "`'1d2h34m'` or `2 days`, for example. Got: {time_string}",
             time_string=time_string,
+        )
+
+
+class StreamlitSecretNotFoundError(LocalizableStreamlitException, FileNotFoundError):
+    """Exception raised when a secret cannot be found or parsed in the secrets.toml file."""
+
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class StreamlitInvalidWidthError(LocalizableStreamlitException):
+    """Exception raised when an invalid width value is provided."""
+
+    def __init__(self, width: Any, allow_content: bool = False):
+        valid_values = "an integer (pixels) or 'stretch'"
+        if allow_content:
+            valid_values = "an integer (pixels), 'stretch', or 'content'"
+
+        super().__init__(
+            "Invalid width value: {width}. Width must be either {valid_values}.",
+            width=repr(width),
+            valid_values=valid_values,
         )

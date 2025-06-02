@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""@st.cache_data: pickle-based caching"""
+"""@st.cache_data: pickle-based caching."""
 
 from __future__ import annotations
 
 import pickle
 import threading
-import types
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -68,6 +67,7 @@ from streamlit.runtime.stats import CacheStat, CacheStatsProvider, group_stats
 from streamlit.time_util import time_to_seconds
 
 if TYPE_CHECKING:
+    import types
     from datetime import timedelta
 
     from streamlit.runtime.caching.hashing import HashFuncsDict
@@ -81,7 +81,7 @@ CachePersistType: TypeAlias = Union[Literal["disk"], None]
 
 
 class CachedDataFuncInfo(CachedFuncInfo):
-    """Implements the CachedFuncInfo interface for @st.cache_data"""
+    """Implements the CachedFuncInfo interface for @st.cache_data."""
 
     def __init__(
         self,
@@ -113,7 +113,7 @@ class CachedDataFuncInfo(CachedFuncInfo):
 
     @property
     def display_name(self) -> str:
-        """A human-readable name for the cached function"""
+        """A human-readable name for the cached function."""
         return f"{self.func.__module__}.{self.func.__qualname__}"
 
     def get_function_cache(self, function_key: str) -> Cache:
@@ -127,7 +127,7 @@ class CachedDataFuncInfo(CachedFuncInfo):
 
     def validate_params(self) -> None:
         """
-        Validate the params passed to @st.cache_data are compatible with cache storage
+        Validate the params passed to @st.cache_data are compatible with cache storage.
 
         When called, this method could log warnings if cache params are invalid
         for current storage.
@@ -141,7 +141,7 @@ class CachedDataFuncInfo(CachedFuncInfo):
 
 
 class DataCaches(CacheStatsProvider):
-    """Manages all DataCache instances"""
+    """Manages all DataCache instances."""
 
     def __init__(self):
         self._caches_lock = threading.Lock()
@@ -581,7 +581,7 @@ class CacheDataAPI:
 
         return make_cached_func_wrapper(
             CachedDataFuncInfo(
-                func=cast(types.FunctionType, func),
+                func=cast("types.FunctionType", func),
                 persist=persist_string,
                 show_spinner=show_spinner,
                 max_entries=max_entries,

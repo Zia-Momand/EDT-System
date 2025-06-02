@@ -21,7 +21,7 @@ import types
 from contextlib import contextmanager
 from enum import Enum
 from timeit import default_timer as timer
-from typing import TYPE_CHECKING, Callable, Final
+from typing import TYPE_CHECKING, Callable, Final, Literal, cast
 
 from blinker import Signal
 
@@ -34,6 +34,7 @@ from streamlit.runtime.metrics_util import (
     create_page_profile_message,
     to_microseconds,
 )
+from streamlit.runtime.pages_manager import PagesManager
 from streamlit.runtime.scriptrunner.exec_code import (
     exec_func_with_error_handling,
     modified_sys_path,
@@ -58,10 +59,10 @@ from streamlit.runtime.state import (
     SafeSessionState,
     SessionState,
 )
+from streamlit.source_util import page_sort_key
 
 if TYPE_CHECKING:
     from streamlit.runtime.fragment import FragmentStorage
-    from streamlit.runtime.pages_manager import PagesManager
     from streamlit.runtime.scriptrunner.script_cache import ScriptCache
     from streamlit.runtime.uploaded_file_manager import UploadedFileManager
 
@@ -114,6 +115,57 @@ script thread. Calling Streamlit functions from other threads is unlikely to
 work correctly due to lack of ScriptRunContext, so we may add a guard against
 it in the future.
 """
+
+
+# For projects that have a pages folder, we assume that this is a script that
+# is designed to leverage our original v1 version of multi-page apps. This
+# function will be called to run the script in lieu of the main script. This
+# function simulates the v1 setup using the modern v2 commands (st.navigation)
+def _mpa_v1(main_script_path: str):
+    from pathlib import Path
+
+    from streamlit.commands.navigation import PageType, _navigation
+    from streamlit.navigation.page import StreamlitPage
+
+    # Select the folder that should be used for the pages:
+    MAIN_SCRIPT_PATH = Path(main_script_path).resolve()
+    PAGES_FOLDER = MAIN_SCRIPT_PATH.parent / "pages"
+
+    # Read out the my_pages folder and create a page for every script:
+    pages = PAGES_FOLDER.glob("*.py")
+    pages = sorted(
+        [
+            page
+            for page in pages
+            if page.name.endswith(".py")
+            and not page.name.startswith(".")
+            and not page.name == "__init__.py"
+        ],
+        key=page_sort_key,
+    )
+
+    # Use this script as the main page and
+    main_page = StreamlitPage(MAIN_SCRIPT_PATH, default=True)
+    all_pages = [main_page] + [
+        StreamlitPage(PAGES_FOLDER / page.name) for page in pages
+    ]
+    # Initialize the navigation with all the pages:
+    position: Literal["sidebar", "hidden"] = (
+        "hidden"
+        if config.get_option("client.showSidebarNavigation") is False
+        else "sidebar"
+    )
+    page = _navigation(
+        cast("list[PageType]", all_pages),
+        position=position,
+        expanded=False,
+    )
+
+    if page._page != main_page._page:
+        # Only run the page if it is not pointing to this script:
+        page.run()
+        # Finish the script execution here to only run the selected page
+        raise StopException()
 
 
 class ScriptRunner:
@@ -310,6 +362,7 @@ class ScriptRunner:
             gather_usage_stats=bool(config.get_option("browser.gatherUsageStats")),
             fragment_storage=self._fragment_storage,
             pages_manager=self._pages_manager,
+            context_info=None,
         )
         add_script_run_ctx(threading.current_thread(), ctx)
 
@@ -334,7 +387,7 @@ class ScriptRunner:
         )
 
     def _is_in_script_thread(self) -> bool:
-        """True if the calling function is running in the script thread"""
+        """True if the calling function is running in the script thread."""
         return self._script_thread == threading.current_thread()
 
     def _enqueue_forward_msg(self, msg: ForwardMsg) -> None:
@@ -468,6 +521,8 @@ class ScriptRunner:
                 query_string=rerun_data.query_string,
                 page_script_hash=page_script_hash,
                 fragment_ids_this_run=fragment_ids_this_run,
+                cached_message_hashes=rerun_data.cached_message_hashes,
+                context_info=rerun_data.context_info,
             )
 
             self.on_event.send(
@@ -503,7 +558,7 @@ class ScriptRunner:
 
             except Exception as ex:
                 # We got a compile error. Send an error event and bail immediately.
-                _LOGGER.debug("Fatal script error", exc_info=ex)
+                _LOGGER.exception("Script compilation error", exc_info=ex)
                 self._session_state[SCRIPT_RUN_WITHOUT_ERRORS_KEY] = False
                 self.on_event.send(
                     self,
@@ -588,6 +643,8 @@ class ScriptRunner:
                                 pass
 
                     else:
+                        if PagesManager.uses_pages_directory:
+                            _mpa_v1(self._main_script_path)
                         exec(code, module.__dict__)
                         self._fragment_storage.clear(
                             new_fragment_ids=ctx.new_fragment_ids

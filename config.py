@@ -12,6 +12,7 @@ from datetime import date, timedelta, datetime
 import numpy as np
 import plotly.express as px
 import altair as alt
+from logger_manager import LoggerManager
 
 # Fitbit OAuth2 configuration constants
 CLIENT_ID = "23PDSY"
@@ -22,6 +23,8 @@ TOKEN_URI = "https://api.fitbit.com/oauth2/token"
 
 # Define the path for tokens.json (in the same folder as this file)
 TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
+# Initialize logger
+logger = LoggerManager()
 
 # ----- OAuth Flow Functions --------------------------------------------------
 #def get_fitbit_auth_url():
@@ -236,7 +239,7 @@ def refresh_fitbit_tokens(refresh_token):
 #     with open(file_path, "w", encoding="utf-8") as f:
 #         json.dump(json_data, f, indent=2)
 #     return json_data
-
+@logger.log_user_activity
 def load_heart_rate_data_for_day(date_str, label):
     """
     Load the heart rate JSON file for the given date (and label) from static/data,
@@ -291,7 +294,7 @@ def load_heart_rate_data_for_day(date_str, label):
 #     with open(file_path, "w", encoding="utf-8") as f:
 #         json.dump(json_data, f, indent=2)
 #     return json_data
-
+@logger.log_user_activity
 def load_heart_rate_data_for_range(start_date, end_date):
     """
     Load the heart rate JSON file for the given date range from static/data,
@@ -305,7 +308,7 @@ def load_heart_rate_data_for_range(start_date, end_date):
     with open(file_path, "r", encoding="utf-8") as f:
         json_data = json.load(f)
     return json_data.get("activities-heart", [])
-
+@logger.log_user_activity
 def load_weekly_heart_rate_data():
     """
     Load the most recent 7 days of heart rate JSON files from static/data,
@@ -332,6 +335,7 @@ def load_weekly_heart_rate_data():
     return weekly_data
 
 # ----- Data Processing and Plotting Functions -------------------------------
+@logger.log_user_activity
 def process_heart_rate_data(data):
     """Process raw heart rate data into a DataFrame (for intraday data)."""
     if not data:
@@ -341,9 +345,10 @@ def process_heart_rate_data(data):
     df.set_index("time", inplace=True)
     return df
 
+@logger.log_user_activity
 def calculate_rmssd_for_5min_intervals(data):
     """
-    Calculate RMSSD (Root Mean Square of Successive Differences) for each 5-minute interval.
+    Calculate RMSSD for each 5-minute interval and visualize with color-coded thresholds.
     """
     if not data or len(data) < 5:
         st.warning("Insufficient data to calculate RMSSD.")
@@ -356,12 +361,12 @@ def calculate_rmssd_for_5min_intervals(data):
 
     for i in range(0, len(df) - 5, 5):
         window = df.iloc[i : i + 5]
-        # Check that time differences are roughly 1 minute apart
+        # Ensure 1-minute interval spacing
         time_diff = np.diff(window["Time"].astype(np.int64) // 10**9) / 60
         if not np.all(time_diff == 1):
             continue
 
-        # Convert heart rate (BPM) to RR intervals in milliseconds
+        # Convert BPM to RR intervals (ms)
         rr_intervals = 60000 / window["value"]
         rr_diffs = np.diff(rr_intervals)
         rmssd = np.sqrt(np.mean(rr_diffs**2))
@@ -371,6 +376,25 @@ def calculate_rmssd_for_5min_intervals(data):
     if not rmssd_results:
         st.warning("No valid RMSSD results due to inconsistent time intervals.")
         return None
+
+    # Create DataFrame for visualization
+    df_plot = pd.DataFrame({
+        "Time": time_labels,
+        "RMSSD": rmssd_results
+    })
+
+    # Base line chart
+    line = alt.Chart(df_plot).mark_line(color='blue').encode(
+        x=alt.X('Time:T', title='Time'),
+        y=alt.Y('RMSSD:Q', title='RMSSD (ms)')
+    )
+
+    # Threshold lines
+    normal = alt.Chart(pd.DataFrame({'y': [60]})).mark_rule(color='green', strokeDash=[2, 2]).encode(y='y')
+    moderate = alt.Chart(pd.DataFrame({'y': [30]})).mark_rule(color='orange', strokeDash=[4, 2]).encode(y='y')
+    low = alt.Chart(pd.DataFrame({'y': [10]})).mark_rule(color='red', strokeDash=[4, 4]).encode(y='y')
+
+    st.altair_chart(line + normal + moderate + low, use_container_width=True)
 
     return time_labels, rmssd_results
 
@@ -403,6 +427,7 @@ def calculate_rmssd_for_5min_intervals(data):
 #         st.error(f"Failed to fetch sleep data: {response.status_code} - {response.text}")
 #         return None
 #### =============================== Sleep stages process functions =============================
+@logger.log_user_activity
 def load_sleep_data(date_str=None):
 
     base_dir = os.path.join("static", "data", "sleep")
@@ -439,6 +464,7 @@ def load_sleep_data(date_str=None):
     except Exception as e:
         print(f"Error loading file: {file_path}. Reason: {e}")
         return None
+@logger.log_user_activity
 def process_sleep_data(sleep_data):
     """
     Process Fitbit sleep data into a structured DataFrame.
@@ -468,7 +494,7 @@ def process_sleep_data(sleep_data):
     # Create a label combining sleep level and its duration
     df["label"] = df.apply(lambda row: f"{row['level'].capitalize()} ({row['duration_text']})", axis=1)
     return df
-
+@logger.log_user_activity
 def plot_sleep_stages(df):
     """
     Create a clear sleep stages timeline using Altair.
@@ -568,6 +594,7 @@ def plot_sleep_stages(df):
     st.altair_chart(chart, use_container_width=True)
 
 ###-----------   Plotting sleep stages trends --------------------
+@logger.log_user_activity
 def plot_sleep_trends(start_date, end_date, period='daily'):
 
     date_range = pd.date_range(start=start_date, end=end_date)
@@ -628,21 +655,42 @@ def plot_sleep_trends(start_date, end_date, period='daily'):
     )
     
     return chart
+@logger.log_user_activity
 def plot_heart_rate_for_day(date_str, label):
     """
-    Plot heart rate data for a given day (intraday data) using Streamlit's line_chart.
+    Plot heart rate data for a given day (intraday data) with color-coded threshold indicators.
     """
     dataset = load_heart_rate_data_for_day(date_str, label)
     if not dataset:
         st.warning("No heart rate data available.")
         return
+
     df = process_heart_rate_data(dataset)
     if df is None or df.empty:
         st.warning("No valid heart rate data to plot.")
         return
-    df_plot = df.reset_index().rename(columns={"time": "Time", "value": "Heart Rate"})
-    st.line_chart(df_plot.set_index("Time")["Heart Rate"])
 
+    df_plot = df.reset_index().rename(columns={"time": "Time", "value": "Heart Rate"})
+
+    # Base heart rate line chart
+    line = alt.Chart(df_plot).mark_line(color='blue').encode(
+        x='Time:T',
+        y='Heart Rate:Q'
+    ).properties(
+        title='Heart Rate Over Time'
+    )
+
+    # Threshold indicators
+    normal_line = alt.Chart(pd.DataFrame({'y': [60]})).mark_rule(color='green', strokeDash=[2, 2]).encode(y='y')
+    elevated_line = alt.Chart(pd.DataFrame({'y': [100]})).mark_rule(color='orange', strokeDash=[4, 2]).encode(y='y')
+    abnormal_line = alt.Chart(pd.DataFrame({'y': [130]})).mark_rule(color='red', strokeDash=[4, 4]).encode(y='y')
+
+    # Combine all
+    chart = line + normal_line + elevated_line + abnormal_line
+
+    st.altair_chart(chart, use_container_width=True)
+
+@logger.log_user_activity
 def plot_weekly_heart_rate():
     """
     Plot weekly heart rate trends using Streamlit's line_chart.
@@ -665,6 +713,7 @@ def plot_weekly_heart_rate():
     df = df.sort_values("Time")
     st.line_chart(df.set_index("Time")["Heart Rate"])
 
+@logger.log_user_activity
 def plot_rmssd_trends(date_str, label):
     """
     Load heart rate data, calculate RMSSD for 5-minute intervals, and plot the trends.

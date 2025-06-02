@@ -78,7 +78,8 @@ def validate_emoji(maybe_emoji: str | None) -> str:
 
 def validate_material_icon(maybe_material_icon: str | None) -> str:
     """Validate a Material icon shortcode and return the icon in
-    normalized format if valid."""
+    normalized format if valid.
+    """
 
     supported_icon_packs = [
         "material",
@@ -135,7 +136,7 @@ def extract_leading_emoji(text: str) -> tuple[str, str]:
     # This cast to Any+type annotation weirdness is done because
     # cast(re.Match[str], ...) explodes at runtime since Python interprets it
     # as an attempt to index into re.Match instead of as a type annotation.
-    re_match: re.Match[str] = cast(Any, re_match)
+    re_match: re.Match[str] = cast("Any", re_match)
     return re_match.group(1), re_match.group(2)
 
 
@@ -165,7 +166,7 @@ def is_binary_string(inp: bytes) -> bool:
 
 
 def simplify_number(num: int) -> str:
-    """Simplifies number into Human readable format, returns str"""
+    """Simplifies number into Human readable format, returns str."""
     num_converted = float(f"{num:.2g}")
     magnitude = 0
     while abs(num_converted) >= 1000:

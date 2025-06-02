@@ -99,25 +99,42 @@ class SPO2Analyzer:
         return all_records
     @staticmethod
     def plot_spo2_last_night(spo2_data):
-        # New data format: use "dateTime" and "minutes" keys.
-        df = pd.DataFrame(spo2_data["minutes"])
-        # Convert the "minute" field to a datetime column.
-        df["time_dt"] = pd.to_datetime(df["minute"])
+             # Create DataFrame from minutes data
+            df = pd.DataFrame(spo2_data["minutes"])
+            df["time_dt"] = pd.to_datetime(df["minute"])
+
+            # Main SPO2 line (default color)
+            spo2_line = alt.Chart(df).mark_line(point=True).encode(
+                x=alt.X("time_dt:T", title="Time"),
+                y=alt.Y("value:Q", title="SpO₂ Level (%)", scale=alt.Scale(domain=[85, 100])),
+                tooltip=[
+                    alt.Tooltip("time_dt:T", title="Time", format="%H:%M"),
+                    alt.Tooltip("value:Q", title="SpO₂")
+                ]
+            )
+
+            # Threshold lines
+            thresholds = pd.DataFrame({
+                "label": ["Severe", "Moderate", "Mild", "Normal"],
+                "value": [88, 89, 94, 95],
+                "color": ["red", "orange", "yellow", "green"]
+            })
+
+            threshold_lines = alt.Chart(thresholds).mark_rule(strokeDash=[4, 4]).encode(
+                y="value:Q",
+                color=alt.Color("label:N", scale=alt.Scale(domain=thresholds["label"].tolist(), range=thresholds["color"].tolist())),
+                tooltip=alt.Tooltip("label:N", title="Threshold")
+            )
+
+            # Combine and render
+            chart = (spo2_line + threshold_lines).properties(
+                title="SpO₂ Levels for Last Night with Hypoxemia Thresholds",
+                width=600,
+                height=400
+            )
         
-        chart = alt.Chart(df).mark_line(point=True).encode(
-            x=alt.X("time_dt:T", title="Time"),
-            y=alt.Y("value:Q", title="SPO2 Level (%)", scale=alt.Scale(domain=[80, 100])),
-            tooltip=[
-                alt.Tooltip("time_dt:T", title="Time", format="%H:%M"),
-                alt.Tooltip("value:Q", title="SPO2")
-            ]
-        ).properties(
-            title=f"SPO2 Levels for Last Night ({spo2_data['dateTime']})",
-            width=600,
-            height=300
-        )
-        
-        st.altair_chart(chart, use_container_width=True)
+            st.altair_chart(chart, use_container_width=True)
+
     @staticmethod
     def plot_spo2_weekly():
         all_records = SPO2Analyzer.load_weekly_spo2_data()
@@ -237,9 +254,65 @@ class SPO2Analyzer:
                 abnormal_text = f"Minimum SpO₂ recorded: {min_val:.1f}%. {message}"
                 with st.spinner("Analyzing abnormality and generating recommendation..."):
                     advice = SPO2Analyzer.get_ai_recommendation(abnormal_text)
-                st.markdown("### 🧠 AI-Generated Care Recommendations")
-                st.markdown(advice)
-    #-------- get AI recommendations function
+                # Store result in session_state
+                st.session_state["spo2_recommendation"] = advice
+
+            
+    @staticmethod
+    def display_spo2_history_summary(n_days=5):
+        st.markdown("### 📜 Recent SpO₂ History Summary")
+        base_dir = os.path.join("static", "data", "spo2")
+        today = datetime.today()
+
+        history_data = []
+        for i in range(1, n_days + 1):
+            date_str = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+            file_path = os.path.join(base_dir, f"{date_str}_spo2.json")
+            if not os.path.exists(file_path):
+                continue
+            with open(file_path, "r", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                    values = [float(x["value"]) for x in data.get("minutes", []) if "value" in x]
+                    if values:
+                        min_val = min(values)
+                        if min_val < 88:
+                            label = "Severe"
+                            color = "red"
+                        elif min_val < 90:
+                            label = "Moderate"
+                            color = "orange"
+                        elif min_val < 95:
+                            label = "Mild"
+                            color = "yellow"
+                        else:
+                            label = "Normal"
+                            color = "green"
+                        history_data.append({
+                            "date": date_str,
+                            "min_spo2": min_val,
+                            "label": label,
+                            "color": color
+                        })
+                except Exception as e:
+                    continue
+
+        if not history_data:
+            st.info("No recent abnormal SpO₂ history found.")
+            return
+
+        for entry in history_data:
+            st.markdown(
+                f"""
+                <div style="padding: 10px; border-left: 5px solid {entry['color']}; margin-bottom: 10px;">
+                    <b>{entry['date']}</b><br>
+                    Minimum SpO₂: <b>{entry['min_spo2']}%</b><br>
+                    Status: <span style="color:{entry['color']}; font-weight:bold;">{entry['label']}</span>
+                </div>
+                """, unsafe_allow_html=True
+            )
+
+        #-------- get AI recommendations function
     @staticmethod
     def get_ai_recommendation(abnormal_details: str) -> str:
             """

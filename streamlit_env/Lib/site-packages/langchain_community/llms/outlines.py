@@ -59,7 +59,7 @@ class Outlines(LLM):
     """Whether to stream the results, token by token."""
 
     regex: Optional[str] = None
-    """Regular expression for structured generation.
+    r"""Regular expression for structured generation.
     
     If provided, Outlines will guarantee that the generated text matches this regex.
     This can be useful for generating structured outputs like IP addresses, dates, etc.
@@ -195,7 +195,13 @@ class Outlines(LLM):
             self.client = models.transformers(self.model, **self.model_kwargs)
         elif self.backend == "transformers_vision":
             check_packages_installed(
-                ["transformers", "datasets", "torchvision", "PIL", "flash_attn"]
+                [
+                    "transformers",
+                    "datasets",
+                    "torchvision",
+                    "PIL",
+                    "flash_attn",
+                ]
             )
             from transformers import LlavaNextForConditionalGeneration
 

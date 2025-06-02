@@ -193,9 +193,9 @@ class WriteMixin:
                     if len(chunk.choices) == 0 or chunk.choices[0].delta is None:
                         # The choices list can be empty. E.g. when using the
                         # AzureOpenAI client, the first chunk will always be empty.
-                        chunk = ""
+                        chunk = ""  # noqa: PLW2901
                     else:
-                        chunk = chunk.choices[0].delta.content or ""
+                        chunk = chunk.choices[0].delta.content or ""  # noqa: PLW2901
                 except AttributeError as err:
                     raise StreamlitAPIException(
                         "Failed to parse the OpenAI ChatCompletionChunk. "
@@ -208,7 +208,7 @@ class WriteMixin:
             if type_util.is_type(chunk, "langchain_core.messages.ai.AIMessageChunk"):
                 # Try to convert LangChain message chunk to a string:
                 try:
-                    chunk = chunk.content or ""
+                    chunk = chunk.content or ""  # noqa: PLW2901
                 except AttributeError as err:
                     raise StreamlitAPIException(
                         "Failed to parse the LangChain AIMessageChunk. "
@@ -336,7 +336,6 @@ class WriteMixin:
 
         Examples
         --------
-
         Its basic use case is to draw Markdown-formatted text, whenever the
         input is a string:
 
@@ -408,6 +407,14 @@ class WriteMixin:
                 kwargs,
             )
 
+        if len(args) == 1 and isinstance(args[0], str):
+            # Optimization: If there is only one arg, and it's a string,
+            # we can just call markdown directly and skip the buffer logic.
+            # This also prevents unnecessary usage of `st.empty()`.
+            # This covers > 80% of all `st.write` uses.
+            self.dg.markdown(args[0], unsafe_allow_html=unsafe_allow_html)
+            return
+
         string_buffer: list[str] = []
 
         # This bans some valid cases like: e = st.empty(); e.write("a", "b").
@@ -476,7 +483,9 @@ class WriteMixin:
                 flush_buffer()
                 self.dg.image(arg)
             elif type_util.is_keras_model(arg):
-                from tensorflow.python.keras.utils import vis_utils
+                from tensorflow.python.keras.utils import (  # type: ignore
+                    vis_utils,
+                )
 
                 flush_buffer()
                 dot = vis_utils.model_to_dot(arg)
@@ -529,7 +538,7 @@ class WriteMixin:
                 flush_buffer()
                 # We cast arg to type here to appease mypy, due to bug in mypy:
                 # https://github.com/python/mypy/issues/12933
-                self.dg.help(cast(type, arg))
+                self.dg.help(cast("type", arg))
             elif unsafe_allow_html and type_util.has_callable_attr(arg, "_repr_html_"):
                 self.dg.html(arg._repr_html_())
             elif type_util.has_callable_attr(

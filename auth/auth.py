@@ -19,24 +19,52 @@ def hash_password(password):
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 # Function to register a user in the database
-def register_user(first_name, last_name, username, password):
+def register_user(first_name, last_name, username, password, email, caregiver_type):
     hashed_pwd = hash_password(password)
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
+        # Step 1: Check if the table exists; if not, create it
         cursor.execute("""
-            INSERT INTO users (first_name, last_name, username, password) 
-            VALUES (%s, %s, %s, %s)
-        """, (first_name, last_name, username, hashed_pwd))
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' AND table_name = 'users'
+            )
+        """)
+        table_exists = cursor.fetchone()[0]
+
+        if not table_exists:
+            cursor.execute("""
+                CREATE TABLE users (
+                    id SERIAL PRIMARY KEY,
+                    first_name VARCHAR(50) NOT NULL,
+                    last_name VARCHAR(50) NOT NULL,
+                    email VARCHAR(100) NOT NULL,
+                    caregiver_type VARCHAR(20) NOT NULL,
+                    username VARCHAR(50) UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.commit()
+
+        # Step 2: Insert user
+        cursor.execute("""
+            INSERT INTO users (first_name, last_name, email, caregiver_type, username, password) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (first_name, last_name, email, caregiver_type, username, hashed_pwd))
         conn.commit()
         return True
+
     except psycopg2.IntegrityError:
         conn.rollback()
         return False
+
     finally:
         cursor.close()
         conn.close()
+
 
 # Function to check user login
 def login_user(username, password):
@@ -64,3 +92,20 @@ def login_user(username, password):
         }
 
     return None
+
+def save_login_token(username, token):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET session_token = %s WHERE username = %s", (token, username))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def check_token_valid(token):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users WHERE session_token = %s", (token,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result[0] if result else None

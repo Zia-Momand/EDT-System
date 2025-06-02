@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Server related utility functions"""
+"""Server related utility functions."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Literal
+from typing import TYPE_CHECKING, Callable, Final, Literal
 from urllib.parse import urljoin
 
 from streamlit import config, net_util, url_util
@@ -47,7 +47,7 @@ def is_url_from_allowed_origins(url: str) -> bool:
 
     hostname = url_util.get_hostname(url)
 
-    allowed_domains = [  # List[Union[str, Callable[[], Optional[str]]]]
+    allowed_domains: list[str | Callable[[], str | None]] = [
         # Check localhost first.
         "localhost",
         "0.0.0.0",
@@ -61,13 +61,14 @@ def is_url_from_allowed_origins(url: str) -> bool:
     ]
 
     for allowed_domain in allowed_domains:
-        if callable(allowed_domain):
-            allowed_domain = allowed_domain()
+        allowed_domain_str = (
+            allowed_domain() if callable(allowed_domain) else allowed_domain
+        )
 
-        if allowed_domain is None:
+        if allowed_domain_str is None:
             continue
 
-        if hostname == allowed_domain:
+        if hostname == allowed_domain_str:
             return True
 
     return False
@@ -153,9 +154,7 @@ def _get_browser_address_bar_port() -> int:
 
 
 def emit_endpoint_deprecation_notice(handler: RequestHandler, new_path: str) -> None:
-    """
-    Emits the warning about deprecation of HTTP endpoint in the HTTP header.
-    """
+    """Emits the warning about deprecation of HTTP endpoint in the HTTP header."""
     handler.set_header("Deprecation", True)
     new_url = urljoin(f"{handler.request.protocol}://{handler.request.host}", new_path)
     handler.set_header("Link", f'<{new_url}>; rel="alternate"')

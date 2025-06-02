@@ -137,7 +137,9 @@ def _on_server_start(server: Server) -> None:
 
 
 def _fix_pydeck_mapbox_api_warning() -> None:
-    """Sets MAPBOX_API_KEY environment variable needed for PyDeck otherwise it will throw an exception"""
+    """Sets MAPBOX_API_KEY environment variable needed for PyDeck otherwise it
+    will throw an exception.
+    """
 
     os.environ["MAPBOX_API_KEY"] = config.get_option("mapbox.token")
 
@@ -340,10 +342,14 @@ def run(
     async def main():
         await run_server()
 
-    # Check if we're already in an event loop
-    if asyncio.get_event_loop().is_running():
-        # Use `asyncio.create_task` if we're in an async context
-        asyncio.create_task(main())
-    else:
-        # Otherwise, use `asyncio.run`
+    try:
+        # Check if we're already in an event loop
+        if asyncio.get_running_loop().is_running():
+            # Use `asyncio.create_task` if we're in an async context
+            asyncio.create_task(main())
+        else:
+            # Otherwise, use `asyncio.run`
+            asyncio.run(main())
+    except RuntimeError:
+        # get_running_loop throws RuntimeError if no running event loop
         asyncio.run(main())

@@ -87,8 +87,8 @@ def show_config(
         append_section("[%s]" % section)
         out.append("")
 
-        for key, option in section_options.items():
-            key = option.key.split(".")[1]
+        for _, option in section_options.items():
+            key = option.key.split(".")[-1]
             description_paragraphs = _clean_paragraphs(option.description or "")
 
             last_paragraph_idx = len(description_paragraphs) - 1
