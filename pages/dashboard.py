@@ -22,6 +22,7 @@ from streamlit_echarts import st_echarts
 from logger_manager import LoggerManager
 from streamlit_shadcn_ui import tabs
 from langchain.schema import HumanMessage, AIMessage
+import asyncio
 
 # # Load environment variables from the .env file
 load_dotenv()
@@ -73,6 +74,7 @@ def get_healthcare_recommendation_langchain(current_bpm, resting_bpm, avg_bpm):
     chain = LLMChain(llm=llm, prompt=prompt)
     recommendation = chain.run(current_bpm=current_bpm, avg_bpm=avg_bpm, resting_bpm=resting_bpm)
     return recommendation
+# ====== Follow up chat ======
 
 # Redirect to login page if not authenticated
 if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
@@ -153,7 +155,7 @@ with st.sidebar:
         st.switch_page("main.py")
         
 if "menu_option" not in st.session_state:
-    st.session_state["menu_option"] = "Trends"
+    st.session_state["menu_option"] = "heart_model"
 
 # Render the Selected Page Content
 if st.session_state["menu_option"] == "Trends":
@@ -540,7 +542,7 @@ if st.session_state["menu_option"] == "Trends":
                     description = "Sleep Transition and Fregementations",
                     color_name=  "yellow-80",
                 ) 
-                analyze_sleep_stage_transitions(df_sleep) 
+                analyze_sleep_stage_transitions(df_sleep, sleep_data) 
     # =========== Tab5: Blood Oxygen Saturation Analysis ==============
     elif tabs == "🩸 Blood Oxygen Saturation Analysis":
     
@@ -937,7 +939,11 @@ elif st.session_state["menu_option"] == "heart_model":
                  yield word + " "
                  time.sleep(0.05)
             st.write_stream(stream_data)
+            #======== Follow up questions ========
+            
 
+            
+#========= Respinratory Tab================================
 elif st.session_state["menu_option"] == "respiratory_model":
     st.subheader("🫁 Respiratory Model")
     st.write("Respiratory Model visualization goes here...")

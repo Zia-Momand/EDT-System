@@ -120,13 +120,6 @@ class SleepPattern:
         chart = alt.layer(typical_range_chart, user_bar_chart, text_labels).properties(width=500, height=180)
         st.altair_chart(chart, use_container_width=True)
 
-        # Button to generate AI recommendation
-        if st.button("Ask AI for Recommendation!"):
-            recommendation = SleepPattern.get_ai_recommendation(details)
-            if toast_callback:
-                toast_callback(details, recommendation)
-            st.session_state["ai_recommendation_generated"] = True
-            st.rerun()
 
     @staticmethod
     def get_ai_recommendation(abnormal_details: str) -> str:
@@ -212,7 +205,43 @@ class SleepPattern:
         return "\n\n".join(messages)
 
 # ================================ weekly sleep analysis ================================
+    @staticmethod
+    def get_clinical_recommendation_sleep_metrics(efficiency: float, latency: float, awakenings: int) -> str:
+        """
+        Generate a clinical recommendation for caregivers using GPT-4 based on
+        sleep efficiency, latency, and number of awakenings.
+        """
 
+        prompt_template = """
+        A caregiver is monitoring an elderly individual's sleep using the following nightly metrics:
+
+        - Sleep Efficiency: {efficiency:.1f}%
+        - Sleep Latency: {latency:.1f} minutes
+        - Number of Awakenings: {awakenings}
+
+        Based on these metrics, generate **4 bullet-point recommendations** for the caregiver.
+        Keep them clear, kind, and practical — no medical jargon.
+        
+        ⚠️ Important: Write your answer in this exact format:
+
+        - **[Observation]** → [Caregiver recommendation]
+
+        🚫 Do NOT include intro, summary, or explanations. Only the 4 bullets.
+        """
+
+        prompt = PromptTemplate(
+            template=prompt_template,
+            input_variables=["efficiency", "latency", "awakenings"]
+        )
+
+        try:
+            llm = ChatOpenAI(model_name="gpt-4o", temperature=0.7)
+            chain = LLMChain(llm=llm, prompt=prompt)
+            recommendation = chain.run(efficiency=efficiency, latency=latency / 60, awakenings=awakenings).strip()
+            recommendation = re.sub(r"\n\s*-\s\*\*", "\n\n- **", recommendation)  # enforce formatting
+            return recommendation
+        except Exception as e:
+            return f"❌ Error generating recommendation: {e}"
 #----------- Visualization functions --------------------------------
 def load_sleep_data_for_week(directory="static/data/sleep"):
     """
@@ -562,7 +591,7 @@ def count_awakenings_current_day(sleep_data) -> int:
         return None
     
 #============  Sleep transion and fregramentation  ===============
-def analyze_sleep_stage_transitions(df):
+def analyze_sleep_stage_transitions(df, sleep_data):
     """
     Analyzes sleep stage transitions and fragmentation from processed sleep data,
     and displays both visualizations and plain language interpretations in an info alert.
@@ -685,12 +714,57 @@ def analyze_sleep_stage_transitions(df):
         "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
     )
 
-    # Define the dialog (using st.dialog) that will show the typewriter effect.
-    @st.dialog("AI-Generated Text")
-    def show_dialog():
-     st.markdown(f"<div>{_LOREM_IPSUM}</div>", unsafe_allow_html=True)
 
-    # When the button is clicked, call the dialog.
-    if st.button('Ask AI for Recommendation 💬', use_container_width=True):
-        show_dialog()
-    return transition_prob, transitions_per_hour, pattern_count
+    # === Generate AI recommendation for sleep metrics ===
+    # --- Step 1: Extract metrics from original JSON data ---
+    efficiency_val = calculate_sleep_efficiency_current_day(sleep_data)
+    latency_val = calculate_sleep_latency_current_day(sleep_data)
+    awakenings_val = count_awakenings_current_day(sleep_data)
+
+    # --- Step 2: Store for optional later reuse ---
+    st.session_state["sleep_metrics"] = {
+        "efficiency": efficiency_val,
+        "latency": latency_val,
+        "awakenings": awakenings_val
+    }
+  
+    # --- Step 3: Recommendation Options ---
+    def metrics_are_poor(eff, lat, wakeups):
+        return eff < 80 or lat > 30 * 60 or wakeups > 5
+
+    if None not in (efficiency_val, latency_val, awakenings_val):
+
+        auto_trigger = st.checkbox("⚙️ Automatically show recommendation if metrics are abnormal")
+
+        if auto_trigger and metrics_are_poor(efficiency_val, latency_val, awakenings_val):
+            rec = SleepPattern.get_clinical_recommendation_sleep_metrics(
+                efficiency=efficiency_val,
+                latency=latency_val,
+                awakenings=awakenings_val
+            )
+            def stream_data():
+                for word in rec.split():
+                    yield word + " "
+                    time.sleep(0.04)
+            st.markdown("### 🧠 AI-Generated Caregiver Recommendation")
+            st.write_stream(stream_data)
+
+        else:
+            @st.dialog("🧠 AI-Generated Sleep Metric Recommendation", width="large")
+            def show_dialog():
+                with st.container():
+                    with st.spinner("Analyzing sleep metrics and generating caregiver recommendation..."):
+                        rec = SleepPattern.get_clinical_recommendation_sleep_metrics(
+                            efficiency=efficiency_val,
+                            latency=latency_val,
+                            awakenings=awakenings_val
+                        )
+                    def stream_data():
+                        for word in rec.split():
+                            yield word + " "
+                            time.sleep(0.04)
+                    st.write_stream(stream_data)
+
+            if st.button("Ask AI for Recommendation 💬", use_container_width=True):
+             show_dialog()
+
