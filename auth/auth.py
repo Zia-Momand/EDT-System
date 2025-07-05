@@ -3,10 +3,10 @@ import bcrypt
 
 # PostgreSQL Connection Settings
 DB_PARAMS = {
-    "dbname": "fitbit_db",
-    "user": "fitbit_user",
-    "password": "zia.mommand",
-    "host": "localhost",
+    "dbname": "postgres",  # or your actual DB name if different
+    "user": "dtbxnvdfsq@elderlydt-server",  # important: include server name after '@'
+    "password": "v9$BeI$Xlx0YXYfv",
+    "host": "elderlydt-server.postgres.database.azure.com",
     "port": "5432"
 }
 
