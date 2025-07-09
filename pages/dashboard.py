@@ -825,7 +825,7 @@ elif st.session_state["menu_option"] == "heart_model":
                     const textureLoader = new THREE.TextureLoader();
                     const textures = [];
                     for (let i = 1; i <= 8; i++) {{
-                        textures.push(textureLoader.load(`https://eldersynchealth.com/models/textures/000${{i}}.png`));
+                        textures.push(textureLoader.load(`https://heartmodel.blob.core.windows.net/models/textures/000${{i}}.png`));
                     }}
 
                     const currentBPM = {current_bpm};
@@ -839,7 +839,7 @@ elif st.session_state["menu_option"] == "heart_model":
                     const clock = new THREE.Clock();
 
                     loader.load(
-                        "https://eldersynchealth.com/models/anim/beating-heart-v007a-animated.gltf",
+                        "https://heartmodel.blob.core.windows.net/models/anim/beating-heart-v007a-animated.gltf",
                         (gltf) => {{
                             heartModel = gltf.scene;
                             heartModel.scale.set(0.3, 0.4, 0.4);
