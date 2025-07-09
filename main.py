@@ -20,16 +20,16 @@ from pyngrok import ngrok
 # Start an HTTP tunnel for port 8501 (or your Flask app port)
 # public_url = ngrok.connect(8501, "http")
 # print("Public URL:", public_url)
-CORS_SERVER_PATH = os.path.join(os.path.dirname(__file__), "static", "cors_server.py")
+#CORS_SERVER_PATH = os.path.join(os.path.dirname(__file__), "static", "cors_server.py")
 
-def start_cors_server():
-    """Start the CORS server in the background."""
-    print("Starting CORS Server...")
-    return subprocess.Popen(["python", CORS_SERVER_PATH], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+#def start_cors_server():
+    #"""Start the CORS server in the background."""
+    #print("Starting CORS Server...")
+    #return subprocess.Popen(["python", CORS_SERVER_PATH], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # Start Flask CORS server
-cors_process = start_cors_server()
-time.sleep(2)  # Wait for the Flask server to initialize
+#cors_process = start_cors_server()
+#time.sleep(2)  # Wait for the Flask server to initialize
 
 # ------------------------
 # ✅ Streamlit Session State Setup
