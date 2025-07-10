@@ -7999,3 +7999,220 @@
 2025-07-04 14:27:17,531 - INFO - [User: a@gmail.com] [Session: 0c848d78-76df-4c38-a461-3d84964b8dc5] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
 2025-07-04 14:27:17,668 - INFO - [User: a@gmail.com] [Session: 0c848d78-76df-4c38-a461-3d84964b8dc5] - `calculate_rmssd_for_5min_intervals` completed.
 2025-07-04 14:27:17,701 - INFO - [User: a@gmail.com] [Session: 0c848d78-76df-4c38-a461-3d84964b8dc5] - `plot_rmssd_trends` completed.
+2025-07-04 14:33:48,021 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-04 14:33:48,331 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-04 14:33:48,333 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_heart_rate_data_for_day` completed.
+2025-07-04 14:33:48,655 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-04 14:33:48,707 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_heart_rate_data` completed.
+2025-07-04 14:33:48,756 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_heart_rate_for_day` completed.
+2025-07-04 14:33:49,079 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-04 14:33:49,080 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_heart_rate_data_for_day` completed.
+2025-07-04 14:33:49,395 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-04 14:33:49,458 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_heart_rate_data` completed.
+2025-07-04 14:33:49,774 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-04 14:33:50,081 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-04 14:33:50,085 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_heart_rate_data_for_day` completed.
+2025-07-04 14:33:50,398 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-04 14:33:50,473 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_heart_rate_data` completed.
+2025-07-04 14:33:50,501 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_heart_rate_for_day` completed.
+2025-07-04 14:33:50,805 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-04 14:33:50,806 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_heart_rate_data_for_day` completed.
+2025-07-04 14:33:51,112 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-04 14:33:51,144 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_heart_rate_data` completed.
+2025-07-04 14:33:51,453 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-04 14:33:51,454 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_weekly_heart_rate_data` completed.
+2025-07-04 14:33:51,771 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_weekly_heart_rate`
+2025-07-04 14:33:52,089 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-04 14:33:52,091 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_weekly_heart_rate_data` completed.
+2025-07-04 14:33:52,091 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_weekly_heart_rate` completed.
+2025-07-04 14:34:01,992 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:34:02,333 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_rmssd_trends`
+2025-07-04 14:34:02,658 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-04 14:34:02,661 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_heart_rate_data_for_day` completed.
+2025-07-04 14:34:02,967 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
+2025-07-04 14:34:03,066 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `calculate_rmssd_for_5min_intervals` completed.
+2025-07-04 14:34:03,102 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_rmssd_trends` completed.
+2025-07-04 14:34:27,752 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:27,762 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:28,079 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:28,101 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:28,419 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-07-04 14:34:28,470 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_sleep_stages` completed.
+2025-07-04 14:34:33,371 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:33,373 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:33,702 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:33,710 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:39,216 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:34:46,387 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:46,389 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:46,708 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:46,715 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:47,047 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_trends`
+2025-07-04 14:34:47,361 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:47,370 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:47,715 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:47,725 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:48,042 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:48,063 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:48,387 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:48,398 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:48,726 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:48,727 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:49,049 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:49,060 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:49,370 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:49,372 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:49,695 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:49,705 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:50,024 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:50,026 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:50,341 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:50,351 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:50,674 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:50,676 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:51,002 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:51,007 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:51,317 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:51,318 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:51,620 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:51,631 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:51,962 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:51,963 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:52,284 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:52,295 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:52,622 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:52,623 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:52,938 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:52,947 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:53,271 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:53,272 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:53,580 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:53,585 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:53,908 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:53,909 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:54,222 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:54,234 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:54,549 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:54,563 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:54,882 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:54,889 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:55,355 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:55,369 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:55,676 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:55,685 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:55,695 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `plot_sleep_trends` completed.
+2025-07-04 14:34:57,915 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:57,917 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:34:58,245 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:34:58,259 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-04 14:34:58,591 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:34:58,592 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:35:01,042 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-04 14:35:01,043 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `load_sleep_data` completed.
+2025-07-04 14:35:01,353 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-04 14:35:01,358 - INFO - [User: a@gmail.com] [Session: c35e6d4b-915c-4add-8e20-79d6c67a60af] - `process_sleep_data` completed.
+2025-07-09 13:25:51,348 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-09 13:25:51,669 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-09 13:25:51,683 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_heart_rate_data_for_day` completed.
+2025-07-09 13:25:51,998 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-09 13:25:52,055 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `process_heart_rate_data` completed.
+2025-07-09 13:25:52,117 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `plot_heart_rate_for_day` completed.
+2025-07-09 13:25:52,439 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-09 13:25:52,440 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_heart_rate_data_for_day` completed.
+2025-07-09 13:25:52,751 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-09 13:25:52,772 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `process_heart_rate_data` completed.
+2025-07-09 13:25:53,082 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-09 13:25:53,397 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-09 13:25:53,399 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_heart_rate_data_for_day` completed.
+2025-07-09 13:25:53,754 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-09 13:25:53,843 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `process_heart_rate_data` completed.
+2025-07-09 13:25:53,874 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `plot_heart_rate_for_day` completed.
+2025-07-09 13:25:54,175 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-09 13:25:54,176 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_heart_rate_data_for_day` completed.
+2025-07-09 13:25:54,482 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-09 13:25:54,503 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `process_heart_rate_data` completed.
+2025-07-09 13:25:54,825 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-09 13:25:54,826 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_weekly_heart_rate_data` completed.
+2025-07-09 13:25:55,141 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_weekly_heart_rate`
+2025-07-09 13:25:55,465 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-09 13:25:55,465 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_weekly_heart_rate_data` completed.
+2025-07-09 13:25:55,466 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `plot_weekly_heart_rate` completed.
+2025-07-09 13:26:06,269 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-09 13:26:06,602 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_rmssd_trends`
+2025-07-09 13:26:06,921 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-09 13:26:06,925 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `load_heart_rate_data_for_day` completed.
+2025-07-09 13:26:07,232 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
+2025-07-09 13:26:07,340 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `calculate_rmssd_for_5min_intervals` completed.
+2025-07-09 13:26:07,373 - INFO - [User: mommand.csf@gmail.com] [Session: d793d016-914c-40ee-9068-7f8c5ed98b9a] - `plot_rmssd_trends` completed.
+2025-07-10 11:01:06,432 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-10 11:01:06,732 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:01:06,744 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:01:07,056 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:01:07,091 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:01:07,167 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_heart_rate_for_day` completed.
+2025-07-10 11:01:07,482 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:01:07,484 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:01:07,821 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:01:07,877 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:01:08,200 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-10 11:01:08,519 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:01:08,522 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:01:08,818 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:01:08,846 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:01:08,883 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_heart_rate_for_day` completed.
+2025-07-10 11:01:09,206 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:01:09,206 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:01:09,518 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:01:09,551 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:01:09,869 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-10 11:01:09,871 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_weekly_heart_rate_data` completed.
+2025-07-10 11:01:10,185 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_weekly_heart_rate`
+2025-07-10 11:01:10,500 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-10 11:01:10,501 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_weekly_heart_rate_data` completed.
+2025-07-10 11:01:10,502 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_weekly_heart_rate` completed.
+2025-07-10 11:01:28,869 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-10 11:01:29,441 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_rmssd_trends`
+2025-07-10 11:01:29,755 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:01:29,757 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:01:30,056 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
+2025-07-10 11:01:30,172 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `calculate_rmssd_for_5min_intervals` completed.
+2025-07-10 11:01:30,220 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_rmssd_trends` completed.
+2025-07-10 11:03:46,757 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_sleep_data`
+2025-07-10 11:03:46,769 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_sleep_data` completed.
+2025-07-10 11:03:47,088 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_sleep_data`
+2025-07-10 11:03:47,100 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_sleep_data` completed.
+2025-07-10 11:03:47,420 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_sleep_stages`
+2025-07-10 11:03:47,446 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_sleep_stages` completed.
+2025-07-10 11:03:51,484 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-10 11:03:51,782 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:03:51,785 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:03:52,096 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:03:52,131 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:03:52,177 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_heart_rate_for_day` completed.
+2025-07-10 11:03:52,503 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:03:52,505 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:03:52,823 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:03:52,849 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:03:53,167 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_heart_rate_for_day`
+2025-07-10 11:03:53,483 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:03:53,484 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:03:53,794 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:03:53,817 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:03:53,855 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_heart_rate_for_day` completed.
+2025-07-10 11:03:54,153 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:03:54,155 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:03:54,459 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `process_heart_rate_data`
+2025-07-10 11:03:54,498 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `process_heart_rate_data` completed.
+2025-07-10 11:03:54,812 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-10 11:03:54,812 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_weekly_heart_rate_data` completed.
+2025-07-10 11:03:55,737 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_weekly_heart_rate`
+2025-07-10 11:03:56,057 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_weekly_heart_rate_data`
+2025-07-10 11:03:56,058 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_weekly_heart_rate_data` completed.
+2025-07-10 11:03:56,059 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_weekly_heart_rate` completed.
+2025-07-10 11:04:09,392 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-10 11:04:09,711 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `plot_rmssd_trends`
+2025-07-10 11:04:10,015 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `load_heart_rate_data_for_day`
+2025-07-10 11:04:10,019 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `load_heart_rate_data_for_day` completed.
+2025-07-10 11:04:10,351 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] [IP: 202.28.7.4] [Location: Bangkok, Bangkok, TH] - Calling `calculate_rmssd_for_5min_intervals`
+2025-07-10 11:04:10,474 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `calculate_rmssd_for_5min_intervals` completed.
+2025-07-10 11:04:10,512 - INFO - [User: B] [Session: b51fcbfc-16a1-46e9-9a87-a54ee798a9db] - `plot_rmssd_trends` completed.

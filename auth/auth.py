@@ -6,9 +6,10 @@ DB_PARAMS = {
     "dbname": "postgres",  # or your actual DB name if different
     "user": "dtbxnvdfsq",  # important: include server name after '@'
     "password": "v9$BeI$Xlx0YXYfv",
-    "host": "elderlydt-server.postgres.database.azure.com",
+    "host": "host:elderlydt-server.postgres.database.azure.com",
     "port": "5432",
     "sslmode": "require"
+    
 }
 
 # Function to create a database connection
