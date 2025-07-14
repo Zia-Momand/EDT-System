@@ -6,7 +6,10 @@ import requests
 
 
 class LoggerManager:
-    def __init__(self, log_file="user_activity.log"):
+    def __init__(self, log_file=None):
+        # Default to Azure-safe path
+        if log_file is None:
+            log_file = os.path.join("/home", "user_activity.log")
         self.log_file = log_file
         self.setup_logger()
 
