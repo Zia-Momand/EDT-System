@@ -58,7 +58,15 @@ from config import (
 )
 openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # --- Define a LangChain-based recommendation function ---
+log_file_path = "/home/user_activity.log"
 
+with open(log_file_path, "rb") as f:
+    st.download_button(
+        label="📄 Download User Activity Log",
+        data=f,
+        file_name="user_activity.log",
+        mime="text/plain"
+    )
 def get_healthcare_recommendation_langchain(current_bpm, resting_bpm, avg_bpm):
     prompt_template = """A patient is being monitored and the following heart rate statistics have been recorded:
         - Current BPM (last hour average): {current_bpm}
