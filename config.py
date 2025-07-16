@@ -239,7 +239,7 @@ def refresh_fitbit_tokens(refresh_token):
 #     with open(file_path, "w", encoding="utf-8") as f:
 #         json.dump(json_data, f, indent=2)
 #     return json_data
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Fetch Heart Rate Data", is_final=True)
 def load_heart_rate_data_for_day(date_str, label):
     """
     Load the heart rate JSON file for the given date (and label) from static/data,
@@ -294,7 +294,7 @@ def load_heart_rate_data_for_day(date_str, label):
 #     with open(file_path, "w", encoding="utf-8") as f:
 #         json.dump(json_data, f, indent=2)
 #     return json_data
-@logger.log_user_activity
+#@logger.log_user_activity(task_name="Healthcare Recommendation", is_final=True)
 def load_heart_rate_data_for_range(start_date, end_date):
     """
     Load the heart rate JSON file for the given date range from static/data,
@@ -308,7 +308,7 @@ def load_heart_rate_data_for_range(start_date, end_date):
     with open(file_path, "r", encoding="utf-8") as f:
         json_data = json.load(f)
     return json_data.get("activities-heart", [])
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Fetech Weekly Heart Rate Data", is_final=True)
 def load_weekly_heart_rate_data():
     """
     Load the most recent 7 days of heart rate JSON files from static/data,
@@ -319,7 +319,7 @@ def load_weekly_heart_rate_data():
     weekly_data = {}
 
     for i in range(7):
-        date_str = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+        date_str = '2025-02-27'#(today - timedelta(days=i)).strftime("%Y-%m-%d")
         file_path = os.path.join(base_path, f"{date_str}_24h.json")
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
@@ -335,7 +335,7 @@ def load_weekly_heart_rate_data():
     return weekly_data
 
 # ----- Data Processing and Plotting Functions -------------------------------
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Process Heart Rate Data", is_final=True)
 def process_heart_rate_data(data):
     """Process raw heart rate data into a DataFrame (for intraday data)."""
     if not data:
@@ -345,7 +345,7 @@ def process_heart_rate_data(data):
     df.set_index("time", inplace=True)
     return df
 
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Calculate Heart Rate Variability", is_final=True)
 def calculate_rmssd_for_5min_intervals(data):
     """
     Calculate RMSSD for each 5-minute interval and visualize with color-coded thresholds.
@@ -361,29 +361,26 @@ def calculate_rmssd_for_5min_intervals(data):
 
     for i in range(0, len(df) - 5, 5):
         window = df.iloc[i : i + 5]
-        # Ensure 1-minute interval spacing
         time_diff = np.diff(window["Time"].astype(np.int64) // 10**9) / 60
         if not np.all(time_diff == 1):
             continue
 
-        # Convert BPM to RR intervals (ms)
         rr_intervals = 60000 / window["value"]
         rr_diffs = np.diff(rr_intervals)
         rmssd = np.sqrt(np.mean(rr_diffs**2))
         rmssd_results.append(rmssd)
-        time_labels.append(window.iloc[0]["Time"].strftime("%H:%M"))
+        time_labels.append(window.iloc[0]["Time"])  # 🟢 Keep datetime
 
     if not rmssd_results:
         st.warning("No valid RMSSD results due to inconsistent time intervals.")
         return None
 
-    # Create DataFrame for visualization
     df_plot = pd.DataFrame({
         "Time": time_labels,
         "RMSSD": rmssd_results
     })
 
-    # Base line chart
+    # Base chart
     line = alt.Chart(df_plot).mark_line(color='blue').encode(
         x=alt.X('Time:T', title='Time'),
         y=alt.Y('RMSSD:Q', title='RMSSD (ms)')
@@ -397,6 +394,7 @@ def calculate_rmssd_for_5min_intervals(data):
     st.altair_chart(line + normal + moderate + low, use_container_width=True)
 
     return time_labels, rmssd_results
+
 
 # def fetch_sleep_data():
 #     """
@@ -427,7 +425,7 @@ def calculate_rmssd_for_5min_intervals(data):
 #         st.error(f"Failed to fetch sleep data: {response.status_code} - {response.text}")
 #         return None
 #### =============================== Sleep stages process functions =============================
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Fetch Sleep Data", is_final=True)
 def load_sleep_data(date_str=None):
 
     base_dir = os.path.join("static", "data", "sleep")
@@ -464,7 +462,7 @@ def load_sleep_data(date_str=None):
     except Exception as e:
         print(f"Error loading file: {file_path}. Reason: {e}")
         return None
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Process Sleep Data", is_final=True)
 def process_sleep_data(sleep_data):
     """
     Process Fitbit sleep data into a structured DataFrame.
@@ -494,7 +492,7 @@ def process_sleep_data(sleep_data):
     # Create a label combining sleep level and its duration
     df["label"] = df.apply(lambda row: f"{row['level'].capitalize()} ({row['duration_text']})", axis=1)
     return df
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Plot Sleep Data", is_final=True)
 def plot_sleep_stages(df):
     """
     Create a clear sleep stages timeline using Altair.
@@ -594,7 +592,7 @@ def plot_sleep_stages(df):
     st.altair_chart(chart, use_container_width=True)
 
 ###-----------   Plotting sleep stages trends --------------------
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Show Sleep Trends", is_final=True)
 def plot_sleep_trends(start_date, end_date, period='daily'):
 
     date_range = pd.date_range(start=start_date, end=end_date)
@@ -655,7 +653,7 @@ def plot_sleep_trends(start_date, end_date, period='daily'):
     )
     
     return chart
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Show Daily Heart Rate", is_final=True)
 def plot_heart_rate_for_day(date_str, label):
     """
     Plot heart rate data for a given day (intraday data) with color-coded threshold indicators.
@@ -690,7 +688,7 @@ def plot_heart_rate_for_day(date_str, label):
 
     st.altair_chart(chart, use_container_width=True)
 
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Plot Weekly Heart Rate Trends", is_final=True)
 def plot_weekly_heart_rate():
     """
     Plot weekly heart rate trends using Streamlit's line_chart.
@@ -713,7 +711,7 @@ def plot_weekly_heart_rate():
     df = df.sort_values("Time")
     st.line_chart(df.set_index("Time")["Heart Rate"])
 
-@logger.log_user_activity
+@logger.log_user_activity(task_name="Plot Heart Rate Variability", is_final=True)
 def plot_rmssd_trends(date_str, label):
     """
     Load heart rate data, calculate RMSSD for 5-minute intervals, and plot the trends.
@@ -724,9 +722,9 @@ def plot_rmssd_trends(date_str, label):
     result = calculate_rmssd_for_5min_intervals(heart_rate_data)
     if not result:
         return
-    time_labels, rmssd_values = result
-    df_plot = pd.DataFrame({"Time": time_labels, "RMSSD": rmssd_values})
-    st.line_chart(df_plot.set_index("Time")["RMSSD"])
+    #time_labels, rmssd_values = result
+    #df_plot = pd.DataFrame({"Time": time_labels, "RMSSD": rmssd_values})
+    #st.line_chart(df_plot.set_index("Time")["RMSSD"])
 
 
     #================== Get SpO2 data ============================
