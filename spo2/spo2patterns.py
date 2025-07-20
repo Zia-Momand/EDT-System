@@ -11,7 +11,8 @@ class SPO2Analyzer:
         pass
     @staticmethod
     def load_spo2_data():
-        yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+        #yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday = datetime.strptime("2025-07-18", "%Y-%m-%d")
         file_path = os.path.join("static", "data", "spo2", f"{yesterday}_spo2.json")
 
         if not os.path.exists(file_path):

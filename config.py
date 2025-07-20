@@ -15,169 +15,178 @@ import altair as alt
 from logger_manager import LoggerManager
 
 # Fitbit OAuth2 configuration constants
-CLIENT_ID = "23PDSY"
-CLIENT_SECRET = "54541489aa4c89089e7b20ed97b9087e"
-REDIRECT_URI = "https://myfitbitauth.ngrok.io"
+CLIENT_ID = "23QPFS"
+CLIENT_SECRET = "08df0280cd18975589fe356947c5a1e3"
+REDIRECT_URI = "https://eldersynchealth.com"
 AUTHORIZATION_URI = "https://www.fitbit.com/oauth2/authorize"
 TOKEN_URI = "https://api.fitbit.com/oauth2/token"
 
 # Define the path for tokens.json (in the same folder as this file)
-TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
+#TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
 # Initialize logger
 logger = LoggerManager()
 
 # ----- OAuth Flow Functions --------------------------------------------------
-#def get_fitbit_auth_url():
-    #"""
-    #Generate and return the Fitbit OAuth2 URL for user authorization.
-    #"""
-    #scope = ("heartrate activity oxygen_saturation electrocardiogram "
-             #"cardio_fitness sleep respiratory_rate activity temperature")
-    #response_type = "code"
-    #auth_url = (
-        #f"{AUTHORIZATION_URI}"
-        #f"?response_type={response_type}"
-        #f"&client_id={CLIENT_ID}"
-        #f"&redirect_uri={REDIRECT_URI}"
-        #f"&scope={scope}"
-        #f"&expires_in=604800"  # token expiration in seconds (optional)
-    #)
-    #return auth_url
+# Token storage file
+#TOKENS_FILE = os.path.join(os.path.dirname(__file__), "tokens.json")
 
-# def exchange_code_for_tokens(code):
-#     """
-#     Exchange the provided authorization code for access and refresh tokens.
-#     Adds an 'iat' timestamp to the tokens for expiration checking.
-#     """
+# Step 1: Generate Authorization URL
+# def get_fitbit_auth_url():
+#     scope = (
+#         "respiratory_rate sleep irregular_rhythm_notifications electrocardiogram "
+#         "heartrate cardio_fitness oxygen_saturation temperature activity"
+#     )
+#     response_type = "code"
+#     return (
+#         f"{AUTHORIZATION_URI}"
+#         f"?response_type={response_type}"
+#         f"&client_id={CLIENT_ID}"
+#         f"&redirect_uri={REDIRECT_URI}"
+#         f"&scope={scope.replace(' ', '%20')}"
+#         f"&expires_in=604800"
+#     )
+
+# Step 2: Exchange Authorization Code for Tokens
+# def exchange_code_for_tokens(auth_code):
+#     auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
 #     headers = {
-#         "Content-Type": "application/x-www-form-urlencoded",
-#         "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
+#         "Authorization": f"Basic {auth_header}",
+#         "Content-Type": "application/x-www-form-urlencoded"
 #     }
+
 #     data = {
 #         "client_id": CLIENT_ID,
 #         "grant_type": "authorization_code",
 #         "redirect_uri": REDIRECT_URI,
-#         "code": code,
+#         "code": auth_code,
 #     }
 
 #     response = requests.post(TOKEN_URI, headers=headers, data=data)
+
 #     if response.status_code == 200:
 #         tokens = response.json()
-#         tokens["iat"] = int(time.time())
+
+#         # Extract user_id from the response and include it
+#         if "user_id" in tokens:
+#             tokens["user_id"] = tokens["user_id"]
+
+#         # Save tokens and user_id to JSON
+#         with open(TOKENS_FILE, "w") as f:
+#             json.dump(tokens, f, indent=4)
+
+#         print("✅ Tokens saved with user_id to tokens.json")
 #         return tokens
 #     else:
-#         st.error("Failed to exchange code for tokens.")
-#         st.write(response.text)
+#         print("❌ Failed to get tokens")
+#         print("Response:", response.status_code, response.text)
 #         return None
 
-# # ----- Token Initialization --------------------------------------------------
-# # Add a checkbox to allow forced reauthorization if needed.
-# force_auth = st.checkbox("Force reauthorization (to obtain a fresh token)", value=False)
-# if force_auth and os.path.exists(TOKENS_FILE):
-#     os.remove(TOKENS_FILE)
-#     st.info("Existing token file removed. A new token will be generated.")
-
-# if not os.path.exists(TOKENS_FILE):
-#     st.write("No tokens.json file found. Please authorize the application.")
-#     st.write("Visit the following URL to authorize and obtain a new authorization code:")
-#     #st.write(get_fitbit_auth_url())
-#     new_code = st.text_input("Enter the new authorization code:")
-#     if new_code:
-#         tokens = exchange_code_for_tokens(new_code)
-#         if tokens:
-#             with open(TOKENS_FILE, "w", encoding="utf-8") as f:
-#                 json.dump(tokens, f, indent=4)
-#             st.success("New tokens saved successfully!")
-#         else:
-#             st.error("Failed to exchange new authorization code for tokens.")
-#             st.stop()  # Stop execution if tokens are not obtained.
-# else:
-#     with open(TOKENS_FILE, "r", encoding="utf-8") as f:
-#         tokens = json.load(f)
-
 # ----- Token Manager ---------------------------------------------------------
-class TokenManager:
-    def __init__(self):
-        self.tokensFilePath = TOKENS_FILE
+# def get_valid_tokens():
+#     import requests
+#     import base64
 
-    def read_tokens(self):
-        """Read tokens from the tokens.json file."""
-        if os.path.exists(self.tokensFilePath):
-            with open(self.tokensFilePath, "r", encoding="utf-8") as f:
-                tokens = json.load(f)
-            return tokens
-        return None
+#     def refresh_fitbit_tokens(refresh_token):
+#         auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
+#         headers = {
+#             "Authorization": f"Basic {auth_header}",
+#             "Content-Type": "application/x-www-form-urlencoded"
+#         }
+#         data = {
+#             "grant_type": "refresh_token",
+#             "refresh_token": refresh_token
+#         }
+#         response = requests.post(TOKEN_URI, headers=headers, data=data)
+#         if response.status_code == 200:
+#             tokens = response.json()
+#             with open(TOKENS_FILE, "w") as f:
+#                 json.dump(tokens, f, indent=2)
+#             return tokens
+#         else:
+#             print(f"❌ Failed to refresh tokens: {response.status_code}")
+#             print(response.text)
+#             return None
 
-    def write_tokens(self, tokens):
-        """Write updated tokens to tokens.json."""
-        with open(self.tokensFilePath, "w", encoding="utf-8") as f:
-            json.dump(tokens, f, indent=4)
+#     try:
+#         if not os.path.exists(TOKENS_FILE) or os.path.getsize(TOKENS_FILE) == 0:
+#             raise FileNotFoundError("Token file missing or empty.")
+        
+#         with open(TOKENS_FILE, "r") as f:
+#             tokens = json.load(f)
+
+#         access_token = tokens.get("access_token")
+#         headers = {"Authorization": f"Bearer {access_token}"}
+
+#         # Test token validity by hitting a lightweight endpoint
+#         test_response = requests.get("https://api.fitbit.com/1/user/-/profile.json", headers=headers)
+
+#         if test_response.status_code == 401:
+#             st.warning("🔄 Access token expired. Attempting to refresh...")
+#             tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+#             if tokens:
+#                 st.success("✅ Token refreshed.")
+#                 return tokens
+#             else:
+#                 st.error("❌ Failed to refresh token. Please reauthenticate.")
+#                 raise Exception("Refresh failed")
+
+#         return tokens
+
+#     except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
+#         st.warning(f"⚠️ Token issue: {e}")
+#         st.info("🔑 Please authorize the app to generate a new token.")
+
+#         auth_url = get_fitbit_auth_url()
+#         st.markdown(f"[Click here to authorize Fitbit]({auth_url})", unsafe_allow_html=True)
+
+#         auth_code = st.text_input("Paste the authorization code from the redirect URL here:")
+
+#         if auth_code:
+#             tokens = exchange_code_for_tokens(auth_code.strip().split('#')[0])
+#             if tokens:
+#                 st.success("✅ Token received and saved.")
+#                 return tokens
+#             else:
+#                 st.error("❌ Failed to retrieve tokens.")
+#                 return None
+#         else:
+#             st.stop()  # Wait for user input
+
+   
 
 # ----- Token Expiration and Refresh ------------------------------------------
-def is_token_expired():
-    """
-    Check if the current access token is expired.
-    Uses the 'iat' (issued-at) timestamp plus the 'expires_in' duration.
-    Refresh the token 5 minutes (300 seconds) before actual expiration.
-    """
-    token_manager = TokenManager()
-    tokens = token_manager.read_tokens()
-    if not tokens:
-        return True
-    expires_in = int(tokens.get("expires_in", 0))
-    iat = int(tokens.get("iat", 0))
-    current_time = int(time.time())
-    return current_time >= (iat + expires_in - 300)
+# def refresh_fitbit_tokens(refresh_token):
+#     import requests
+#     import base64
 
-def refresh_fitbit_tokens(refresh_token):
-    """
-    Refresh the access token using the provided refresh token.
-    Adds an 'iat' timestamp to the new tokens and saves them.
-    """
-    headers = {
-        "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {
-       "grant_type": "refresh_token",
-       "refresh_token": refresh_token
-    }
-    response = requests.post(TOKEN_URI, headers=headers, data=data)
-    if response.status_code == 200:
-        new_tokens = response.json()
-        new_tokens["iat"] = int(time.time())
-        # Save new tokens using TokenManager
-        token_manager = TokenManager()
-        token_manager.write_tokens(new_tokens)
-        st.info("Tokens refreshed successfully.")
-        return new_tokens
-    else:
-        st.error("Token refresh failed. Need re-authentication.")
-        st.write(response.text)
-        return None
+#     auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
+#     headers = {
+#         "Authorization": f"Basic {auth_header}",
+#         "Content-Type": "application/x-www-form-urlencoded"
+#     }
 
-# def get_valid_tokens():
-#     """
-#     Retrieve tokens from storage and refresh if they are expired.
-#     Returns valid tokens or stops the app if no valid token is available.
-#     """
-#     token_manager = TokenManager()
-#     tokens = token_manager.read_tokens()
-#     if not tokens:
-#         st.error("No tokens available. Please authenticate.")
-#         st.stop()
-#     if is_token_expired():
-#         st.info("Access token expired. Attempting to refresh...")
-#         refresh_token_val = tokens.get("refresh_token")
-#         new_tokens = refresh_fitbit_tokens(refresh_token_val)
-#         if new_tokens:
-#             tokens = new_tokens
-#         else:
-#             st.error("Token refresh failed. Please reauthenticate.")
-#             st.stop()
-#     return tokens
+#     data = {
+#         "grant_type": "refresh_token",
+#         "refresh_token": refresh_token
+#     }
 
-# ----- Fitbit API URL Helpers -----------------------------------------------
+#     response = requests.post(TOKEN_URI, headers=headers, data=data)
+
+#     if response.status_code == 200:
+#         new_tokens = response.json()
+#         # Save new tokens to tokens.json
+#         with open(TOKENS_FILE, "w") as f:
+#             json.dump(new_tokens, f, indent=2)
+#         print("✅ Tokens refreshed.")
+#         return new_tokens
+#     else:
+#         print(f"❌ Failed to refresh tokens: {response.status_code}")
+#         print(response.text)
+#         return None
+
+
+
+#----- Fitbit API URL Helpers -----------------------------------------------
 # def get_fitbit_api_url_for_day(date_str, detail_level="1min"):
 #     """
 #     Return the intraday API URL for a given day.
@@ -185,7 +194,8 @@ def refresh_fitbit_tokens(refresh_token):
 #     """
 #     tokens = get_valid_tokens()
 #     USER_ID = tokens.get("user_id")
-#     return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{date_str}/1d/{detail_level}.json"
+#     return f"https://api.fitbit.com/1/user/-/activities/heart/date/{date_str}/1d/{detail_level}.json"
+#     #return f"https://api.fitbit.com/1/user/-/activities/heart/date/2025-07-17/1d/1min.json"
 
 # def get_fitbit_api_url_for_range(start_date, end_date):
 #     """
@@ -197,55 +207,65 @@ def refresh_fitbit_tokens(refresh_token):
 #     USER_ID = tokens.get("user_id")
 #     return f"https://api.fitbit.com/1/user/{USER_ID}/activities/heart/date/{start_date}/{end_date}.json"
 
-# ----- Data Fetch and Load Functions ----------------------------------------
+# #--- Data Fetch and Load Functions ----------------------------------------
 # def update_heart_rate_data_for_day(date_str, label, detail_level="1min"):
 #     """
 #     Download heart rate data (in JSON format) for the specified date using the intraday endpoint.
 #     Saves the file in static/data as '<date>_<label>.json' and returns the JSON data.
-#     Automatically refreshes the token if needed.
 #     """
 #     api_url = get_fitbit_api_url_for_day(date_str, detail_level)
 #     tokens = get_valid_tokens()
+
+#     if tokens is None:
+#         st.error("Token unavailable. Cannot fetch heart rate data.")
+#         return None
+
 #     access_token = tokens.get("access_token")
 #     headers = {"Authorization": f"Bearer {access_token}"}
 #     response = requests.get(api_url, headers=headers)
-#     if response.status_code == 200:
-#         json_data = response.json()
-#     elif response.status_code == 401:
-#         # Token might be expired; try refreshing and retrying
-#         tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
-#         if tokens:
-#             access_token = tokens.get("access_token")
-#             headers = {"Authorization": f"Bearer {access_token}"}
-#             response = requests.get(api_url, headers=headers)
-#             if response.status_code == 200:
-#                 json_data = response.json()
-#             else:
-#                 st.error(f"Error after token refresh: {response.status_code}")
-#                 st.write(response.text)
-#                 return None
-#         else:
-#             st.error("Token refresh failed. Please reauthenticate.")
+
+#     # Refresh on 401
+#     if response.status_code == 401:
+#         st.warning("Access token expired. Attempting refresh...")
+#         new_tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
+#         if not new_tokens:
+#             st.error("Token refresh failed.")
 #             return None
-#     else:
-#         st.error(f"Error fetching heart rate data: {response.status_code}")
+#         access_token = new_tokens.get("access_token")
+#         headers = {"Authorization": f"Bearer {access_token}"}
+#         response = requests.get(api_url, headers=headers)
+
+#     if response.status_code != 200:
+#         st.error(f"Failed to fetch data: {response.status_code}")
 #         st.write(response.text)
 #         return None
 
-#     data_dir = os.path.join("static", "data")
-#     os.makedirs(data_dir, exist_ok=True)
-#     file_name = f"{date_str}_{label}.json"
-#     file_path = os.path.join(data_dir, file_name)
-#     with open(file_path, "w", encoding="utf-8") as f:
-#         json.dump(json_data, f, indent=2)
-#     return json_data
+#     # ✅ Success
+#     json_data = response.json()
+
+#     # ✅ Create save path and ensure write works
+#     try:
+#         data_dir = os.path.join("static", "data")
+#         os.makedirs(data_dir, exist_ok=True)
+#         file_name = f"{date_str}_{label}.json"
+#         file_path = os.path.join(data_dir, file_name)
+
+#         with open(file_path, "w", encoding="utf-8") as f:
+#             json.dump(json_data, f, indent=2)
+#         return json_data
+
+#     except Exception as e:
+#         st.error(f"❌ Failed to save JSON file: {e}")
+#         return json_data  # return data anyway
+
+
 @logger.log_user_activity(task_name="Fetch Heart Rate Data", is_final=True)
 def load_heart_rate_data_for_day(date_str, label):
     """
     Load the heart rate JSON file for the given date (and label) from static/data,
     and return the 'dataset' (intraday measurements).
     """
-    file_path = os.path.join("static", "data", "2025-05-02_24h.json")
+    file_path = os.path.join("static", "data", f"{date_str}_{label}.json")
     if not os.path.exists(file_path):
         st.warning(f"No heart rate data file found for {date_str} ({label}). Please refresh.")
         return None
@@ -253,55 +273,14 @@ def load_heart_rate_data_for_day(date_str, label):
         json_data = json.load(f)
     return json_data.get("activities-heart-intraday", {}).get("dataset", [])
 
-# def update_heart_rate_data_for_range(start_date, end_date):
-#     """
-#     Download heart rate data for the specified date range using the range endpoint.
-#     Saves the file in static/data as '<start_date>_to_{end_date}_week.json'
-#     and returns the JSON data.
-#     Automatically refreshes the token if needed.
-#     """
-#     api_url = get_fitbit_api_url_for_range(start_date, end_date)
-#     tokens = get_valid_tokens()
-#     access_token = tokens.get("access_token")
-#     headers = {"Authorization": f"Bearer {access_token}"}
-#     response = requests.get(api_url, headers=headers)
-#     if response.status_code == 200:
-#         json_data = response.json()
-#     elif response.status_code == 401:
-#         tokens = refresh_fitbit_tokens(tokens.get("refresh_token"))
-#         if tokens:
-#             access_token = tokens.get("access_token")
-#             headers = {"Authorization": f"Bearer {access_token}"}
-#             response = requests.get(api_url, headers=headers)
-#             if response.status_code == 200:
-#                 json_data = response.json()
-#             else:
-#                 st.error(f"Error after token refresh: {response.status_code}")
-#                 st.write(response.text)
-#                 return None
-#         else:
-#             st.error("Token refresh failed. Please reauthenticate.")
-#             return None
-#     else:
-#         st.error(f"Error fetching heart rate data: {response.status_code}")
-#         st.write(response.text)
-#         return None
-
-#     data_dir = os.path.join("static", "data")
-#     os.makedirs(data_dir, exist_ok=True)
-#     file_name = f"{start_date}_to_{end_date}_week.json"
-#     file_path = os.path.join(data_dir, file_name)
-#     with open(file_path, "w", encoding="utf-8") as f:
-#         json.dump(json_data, f, indent=2)
-#     return json_data
-#@logger.log_user_activity(task_name="Healthcare Recommendation", is_final=True)
+@logger.log_user_activity(task_name="Healthcare Recommendation", is_final=True)
 def load_heart_rate_data_for_range(start_date, end_date):
     """
     Load the heart rate JSON file for the given date range from static/data,
     and return the dataset.
     (For range data, Fitbit returns summary data per day in the 'activities-heart' key.)
     """
-    file_path = os.path.join("static", "data", f"{start_date}_to_{end_date}_week.json")
+    file_path = os.path.join("static", "data", f"{start_date}_to_{end_date}.json")
     if not os.path.exists(file_path):
         st.warning("No heart rate data file found for the week. Please refresh.")
         return None
@@ -311,16 +290,19 @@ def load_heart_rate_data_for_range(start_date, end_date):
 @logger.log_user_activity(task_name="Fetech Weekly Heart Rate Data", is_final=True)
 def load_weekly_heart_rate_data():
     """
-    Load the most recent 7 days of heart rate JSON files from static/data,
-    extracting weekly trends from available '<date>_24h.json' files.
+    Load up to 7 most recent available days of heart rate JSON files from static/data.
+    Returns a dictionary of date → dataset[] entries.
     """
     base_path = os.path.join("static", "data")
     today = date.today()
     weekly_data = {}
 
+    # Look back up to 7 days from today
     for i in range(7):
-        date_str = '2025-02-27'#(today - timedelta(days=i)).strftime("%Y-%m-%d")
-        file_path = os.path.join(base_path, f"{date_str}_24h.json")
+        date_str = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+        file_name = f"{date_str}_heart_rate.json"
+        file_path = os.path.join(base_path, file_name)
+
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
                 json_data = json.load(f)
@@ -334,14 +316,22 @@ def load_weekly_heart_rate_data():
 
     return weekly_data
 
+
 # ----- Data Processing and Plotting Functions -------------------------------
 @logger.log_user_activity(task_name="Process Heart Rate Data", is_final=True)
-def process_heart_rate_data(data):
-    """Process raw heart rate data into a DataFrame (for intraday data)."""
+def process_heart_rate_data(data, date_str=None):
+    """Process raw heart rate data into a DataFrame with correct datetime index."""
     if not data:
         return None
+
     df = pd.DataFrame(data)
-    df["time"] = pd.to_datetime(df["time"])
+
+    if date_str:
+        # Combine date + time for correct datetime
+        df["time"] = pd.to_datetime(date_str + " " + df["time"])
+    else:
+        df["time"] = pd.to_datetime(df["time"])  # fallback
+
     df.set_index("time", inplace=True)
     return df
 
@@ -401,7 +391,7 @@ def calculate_rmssd_for_5min_intervals(data):
 #     Fetch sleep data from Fitbit API for today's date and save it as a JSON file.
 #     Uses get_valid_tokens() to retrieve stored Fitbit tokens.
 #     """
-#     current_date = datetime.today().strftime("%Y-%m-%d")
+#     current_date = "2025-07-19" #datetime.today().strftime("%Y-%m-%d")
 #     tokens = get_valid_tokens()
 
 #     USER_ID = tokens.get("user_id")
@@ -431,7 +421,7 @@ def load_sleep_data(date_str=None):
     base_dir = os.path.join("static", "data", "sleep")
     
     if date_str is None:
-        date_str = datetime.today().strftime("%Y-%m-%d")
+        date_str = '2025-07-18'#datetime.today().strftime("%Y-%m-%d")
     
     target_file = f"{date_str}_sleep.json"
     file_path = os.path.join(base_dir, target_file)
@@ -663,7 +653,7 @@ def plot_heart_rate_for_day(date_str, label):
         st.warning("No heart rate data available.")
         return
 
-    df = process_heart_rate_data(dataset)
+    df = process_heart_rate_data(dataset, date_str)
     if df is None or df.empty:
         st.warning("No valid heart rate data to plot.")
         return
@@ -677,7 +667,6 @@ def plot_heart_rate_for_day(date_str, label):
     ).properties(
         title='Heart Rate Over Time'
     )
-
     # Threshold indicators
     normal_line = alt.Chart(pd.DataFrame({'y': [60]})).mark_rule(color='green', strokeDash=[2, 2]).encode(y='y')
     elevated_line = alt.Chart(pd.DataFrame({'y': [100]})).mark_rule(color='orange', strokeDash=[4, 2]).encode(y='y')

@@ -19,7 +19,7 @@ import streamlit_antd_components as sac
 from streamlit_extras.colored_header import colored_header
 from spo2.spo2patterns import SPO2Analyzer
 from streamlit_echarts import st_echarts
-from logger_manager import LoggerManager
+#from logger_manager import LoggerManager
 from streamlit_shadcn_ui import tabs
 from langchain.schema import HumanMessage, AIMessage
 import asyncio
@@ -57,16 +57,17 @@ from config import (
     #fetch_spo2_data,
 )
 openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+#st.info(f"🔑 Loaded API Key: {openai_api_key}")
 # --- Define a LangChain-based recommendation function ---
-log_file_path = "/home/user_activity.log"
+#log_file_path = "user_activity.log"
 
-with open(log_file_path, "rb") as f:
-    st.download_button(
-        label="📄 Download User Activity Log",
-        data=f,
-        file_name="user_activity.log",
-        mime="text/plain"
-    )
+#with open(log_file_path, "rb") as f:
+    #st.download_button(
+        #label="📄 Download User Activity Log",
+        #data=f,
+        #file_name="user_activity.log",
+        #mime="text/plain"
+    #)
 def get_healthcare_recommendation_langchain(current_bpm, resting_bpm, avg_bpm):
     prompt_template = """A patient is being monitored and the following heart rate statistics have been recorded:
         - Current BPM (last hour average): {current_bpm}
@@ -78,7 +79,7 @@ def get_healthcare_recommendation_langchain(current_bpm, resting_bpm, avg_bpm):
         Be clear, actionable, and avoid technical jargon.
         """
     prompt = PromptTemplate(template=prompt_template, input_variables=["current_bpm", "avg_bpm", "resting_bpm"])
-    llm = ChatOpenAI(model_name="gpt-4", temperature=0.7)  # Your API key should be configured in st.secrets or env variables.
+    llm = ChatOpenAI(model_name="gpt-4", temperature=0.7,  openai_api_key=openai_api_key )  # Your API key should be configured in st.secrets or env variables.
     chain = LLMChain(llm=llm, prompt=prompt)
     recommendation = chain.run(current_bpm=current_bpm, avg_bpm=avg_bpm, resting_bpm=resting_bpm)
     return recommendation
@@ -96,7 +97,7 @@ with st.sidebar:
     menu_items = [
         ("❤️ Heart Model", "heart_model"),
         ("🛏️ Sleep Pattern Model", "Trends"),
-        ("🫁 Respiratory Model", "respiratory_model"),
+        #("🫁 Respiratory Model", "respiratory_model"),
     ]
     for label, key in menu_items:
         if st.button(label, key=key, use_container_width=True):
@@ -197,7 +198,7 @@ if st.session_state["menu_option"] == "Trends":
     ],
     default_value = "🛏️ Sleep Stages Analysis",
     key="custom_tabs")
-
+    #fetch_sleep_data()
     sleep_data = load_sleep_data()
     df_sleep = process_sleep_data(sleep_data)
     
@@ -482,9 +483,9 @@ if st.session_state["menu_option"] == "Trends":
                 input_cols = st.columns([1, 1, 1])
                 
                 with input_cols[0]:
-                    start_date = st.date_input("📅 Start Date", value=pd.to_datetime("2025-02-15"))
+                    start_date = st.date_input("📅 Start Date", value=pd.to_datetime("2025-07-15"))
                 with input_cols[1]:
-                    end_date = st.date_input("📅 End Date", value=pd.to_datetime("2025-02-27"))
+                    end_date = st.date_input("📅 End Date", value=pd.to_datetime("2025-07-18"))
                 with input_cols[2]:
                     period = st.selectbox("Analysis Period", options=["daily", "weekly"], index=0)
                 
@@ -558,7 +559,7 @@ if st.session_state["menu_option"] == "Trends":
         with st.container():
             col1, col2 = st.columns([2, 2])
             with col1:
-                # fetch_spo2_data()
+                #fetch_spo2_data()
                 spo2_data = SPO2Analyzer.load_spo2_data()
                 SPO2Analyzer.plot_spo2_last_night(spo2_data)
             with col2:
@@ -604,7 +605,7 @@ if st.session_state["menu_option"] == "Trends":
 
                         with st.chat_message("ai"):
                             with st.spinner("Thinking..."):
-                                chat = ChatOpenAI(model_name="gpt-4o", temperature=0.5)
+                                chat = ChatOpenAI(model_name="gpt-4o", temperature=0.5,  openai_api_key=openai_api_key)
                                 context_prompt = f"""
                                     You are assisting a caregiver who received the following sleep-related blood oxygen recommendation:
 
@@ -638,16 +639,14 @@ elif st.session_state["menu_option"] == "heart_model":
         with tabs[0]:
             st.header("24 Hours Trends")
             # For 24-hour trends, we use today's date.
-            date_today = datetime.now().strftime("%Y-%m-%d")
-            # Download and save today's intraday data (using label "24h").
-           # _ = update_heart_rate_data_for_day(date_today, "24h")
+            date_today = '2025-07-18'#atetime.now().strftime("%Y-%m-%d")
+           # _ =update_heart_rate_data_for_day(date_today, "heart_rate")
             # Plot the 24-hour heart rate data.
-            plot_heart_rate_for_day(date_today, "24h")
+            plot_heart_rate_for_day(date_today, "heart_rate")
             #--------- 24 hours Heart Rate Summary --------------------------------
             # Load today's data and process it into a DataFrame.
-            dataset = load_heart_rate_data_for_day(date_today, "24h")
-            df_heart_rate = process_heart_rate_data(dataset)
-            
+            dataset = load_heart_rate_data_for_day(date_today, "heart_rate")
+            df_heart_rate = process_heart_rate_data(dataset, date_today)
             st.markdown("<h3 style=color: #FFD700;'>Heart Rate Summary</h1>", unsafe_allow_html=True)
             if df_heart_rate is not None and not df_heart_rate.empty:
                 st.markdown("<div class='metric-container'>", unsafe_allow_html= True)
@@ -681,11 +680,11 @@ elif st.session_state["menu_option"] == "heart_model":
         # --- Tab 2: Yesterday Trends ---
         with tabs[1]:
             st.header("Yesterday Trends")
-            date_yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            #_ = update_heart_rate_data_for_day(date_yesterday, "yesterday")
-            plot_heart_rate_for_day(date_yesterday, "yesterday")
-            yes_dataset= load_heart_rate_data_for_day(date_yesterday, "yesterday")
-            df_yesterday_heart_rate = process_heart_rate_data(yes_dataset)
+            date_yesterday = "2025-07-17"#(datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            #_ = update_heart_rate_data_for_day(date_yesterday, "heart_rate")
+            plot_heart_rate_for_day(date_yesterday, "heart_rate")
+            dataset= load_heart_rate_data_for_day(date_yesterday, "heart_rate")
+            df_yesterday_heart_rate = process_heart_rate_data(dataset)
             #----------- Yesterday heart rate summary --------------------------------
             st.markdown("<h3 style=color: #FFD700;'>Heart Rate Summary</h1>", unsafe_allow_html=True)
             if df_yesterday_heart_rate is not None and not df_yesterday_heart_rate.empty:
@@ -740,6 +739,8 @@ elif st.session_state["menu_option"] == "heart_model":
             else:
                 st.write("No heart rate data available.")
                     
+
+                    
         #----------- markdows for summary report --------------------
         st.markdown("""
             <style>
@@ -782,8 +783,8 @@ elif st.session_state["menu_option"] == "heart_model":
         #--------  Heart Rate variability --------------------------------
         with tabs[3]:
             st.header("Heart Rate Varibility")
-            date_today = datetime.now().strftime("%Y-%m-%d")
-            plot_rmssd_trends(date_today, "24h")
+            date_today = "2025-07-18"#datetime.now().strftime("%Y-%m-%d")
+            plot_rmssd_trends(date_today, "heart_rate")
     # --- Column 2: 3D Heart Model Visualization ---
     with col2:
         with st.container():

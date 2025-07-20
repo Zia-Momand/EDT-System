@@ -93,7 +93,7 @@ def login():
 
     # Buttons
     login_clicked = st.button(" 🔑 Login", type="primary", use_container_width=True)
-    register_clicked = st.button("➕ Sign Up", type="primary", use_container_width=True)
+    #register_clicked = st.button("➕ Sign Up", type="primary", use_container_width=True)
 
     if login_clicked:
         # Have login_user return either None (bad) or a user-dict on success
@@ -114,8 +114,8 @@ def login():
         else:
             st.error("Invalid username or password")
 
-    if register_clicked:
-        st.session_state.show_register = True
+    #if register_clicked:
+        #st.session_state.show_register = True
 
 # ------------------------
 # ✅ Registration Form

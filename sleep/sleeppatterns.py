@@ -80,9 +80,6 @@ class SleepPattern:
         )
 
         abnormal_stages = df_bench[df_bench["alert"] != ""]
-
-           
-
         # --- 3) Sort by a custom order ---
         stage_order = ["Awake", "REM", "Light", "Deep"]
         df_bench["stage"] = pd.Categorical(df_bench["stage"], categories=stage_order, ordered=True)
@@ -245,11 +242,8 @@ class SleepPattern:
 #----------- Visualization functions --------------------------------
 def load_sleep_data_for_week(directory="static/data/sleep"):
     """
-    Loads sleep data for the past 7 days (today and the previous 6 days) from JSON files.
-    If no recent files are found, loads data from the latest available file and the previous 6 files by date.
-
-    Returns:
-        pd.DataFrame: DataFrame containing sleep data.
+    Loads sleep data for up to 7 days from JSON files, using today's date as reference.
+    Falls back to last 7 available files if target days are missing.
     """
     def parse_date_from_filename(filename):
         try:
@@ -257,27 +251,22 @@ def load_sleep_data_for_week(directory="static/data/sleep"):
         except ValueError:
             return None
 
-    # Get all available sleep data files
+    # Find all available sleep data files
     all_files = [
         f for f in os.listdir(directory)
         if f.endswith("_sleep.json") and parse_date_from_filename(f)
     ]
     
-    # Sort files by date (newest to oldest)
-    sorted_files = sorted(
-        all_files,
-        key=lambda f: parse_date_from_filename(f),
-        reverse=True
-    )
-
-    # Attempt to load today's data and previous 6 days
-    today = datetime.today()
+    sorted_files = sorted(all_files, key=parse_date_from_filename, reverse=True)
+    #today = datetime.today()
+    today = datetime.strptime("2025-07-14", "%Y-%m-%d")
     target_dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
     target_files = [f"{date}_sleep.json" for date in target_dates]
 
     data_list = []
-    loaded_files = set()
+    used_files = set()
 
+    # Try to load files from the last 7 dates (today and 6 previous)
     for file_name in target_files:
         file_path = os.path.join(directory, file_name)
         if os.path.exists(file_path):
@@ -285,45 +274,42 @@ def load_sleep_data_for_week(directory="static/data/sleep"):
                 json_data = json.load(f)
                 if "sleep" in json_data and json_data["sleep"]:
                     record = json_data["sleep"][0]
-                    date_of_sleep = record.get("dateOfSleep", file_name.split("_")[0])
-                    minutes_asleep = record.get("minutesAsleep", 0)
-                    levels = record.get("levels", {}).get("summary", {})
+                    summary = record.get("levels", {}).get("summary", {})
                     data_list.append({
-                        "date": date_of_sleep,
-                        "minutesAsleep": minutes_asleep,
-                        "deep": levels.get("deep", {}).get("minutes", 0),
-                        "light": levels.get("light", {}).get("minutes", 0),
-                        "rem": levels.get("rem", {}).get("minutes", 0),
-                        "wake": levels.get("wake", {}).get("minutes", 0)
+                        "date": record.get("dateOfSleep", file_name.split("_")[0]),
+                        "minutesAsleep": record.get("minutesAsleep", 0),
+                        "deep": summary.get("deep", {}).get("minutes", 0),
+                        "light": summary.get("light", {}).get("minutes", 0),
+                        "rem": summary.get("rem", {}).get("minutes", 0),
+                        "wake": summary.get("wake", {}).get("minutes", 0)
                     })
-                    loaded_files.add(file_name)
+                    used_files.add(file_name)
 
-    # If not enough data loaded, use fallback: last 7 available files
+    # Fallback: load from last 7 available files (not already loaded)
     if len(data_list) < 7:
-        print("Not enough recent data found. Using last 7 available files instead.")
-        data_list = []
-        for file_name in sorted_files[:7]:
-            if file_name not in loaded_files:
-                file_path = os.path.join(directory, file_name)
-                with open(file_path, "r") as f:
-                    json_data = json.load(f)
-                    if "sleep" in json_data and json_data["sleep"]:
-                        record = json_data["sleep"][0]
-                        date_of_sleep = record.get("dateOfSleep", file_name.split("_")[0])
-                        minutes_asleep = record.get("minutesAsleep", 0)
-                        levels = record.get("levels", {}).get("summary", {})
-                        data_list.append({
-                            "date": date_of_sleep,
-                            "minutesAsleep": minutes_asleep,
-                            "deep": levels.get("deep", {}).get("minutes", 0),
-                            "light": levels.get("light", {}).get("minutes", 0),
-                            "rem": levels.get("rem", {}).get("minutes", 0),
-                            "wake": levels.get("wake", {}).get("minutes", 0)
-                        })
+        for file_name in sorted_files:
+            if file_name in used_files:
+                continue
+            file_path = os.path.join(directory, file_name)
+            with open(file_path, "r") as f:
+                json_data = json.load(f)
+                if "sleep" in json_data and json_data["sleep"]:
+                    record = json_data["sleep"][0]
+                    summary = record.get("levels", {}).get("summary", {})
+                    data_list.append({
+                        "date": record.get("dateOfSleep", file_name.split("_")[0]),
+                        "minutesAsleep": record.get("minutesAsleep", 0),
+                        "deep": summary.get("deep", {}).get("minutes", 0),
+                        "light": summary.get("light", {}).get("minutes", 0),
+                        "rem": summary.get("rem", {}).get("minutes", 0),
+                        "wake": summary.get("wake", {}).get("minutes", 0)
+                    })
+                    if len(data_list) >= 7:
+                        break
 
-    # Sort by date before returning
     data_list = sorted(data_list, key=lambda x: x["date"])
     return pd.DataFrame(data_list)
+
 def calculate_average_sleep_duration(df):
     if df.empty:
         return 0
